@@ -2,7 +2,6 @@
 class CacheHandler {
     constructor() {
         this.VIDEO_URLS = [
-            // 与sw.js中相同的视频URL列表
             'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/1%E9%A2%98.mp4',
             'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/2%E9%A2%98.mp4',
             'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/3%E9%A2%98.mp4',
@@ -23,7 +22,6 @@ class CacheHandler {
 
     async checkCacheStatus() {
         if (!navigator.serviceWorker) return;
-        
         try {
             const cache = await caches.open('scratch-videos-v2');
             const requests = await cache.keys();
@@ -39,7 +37,6 @@ class CacheHandler {
 
     async updateCache() {
         if (!navigator.serviceWorker) return false;
-        
         try {
             const reg = await navigator.serviceWorker.ready;
             return new Promise((resolve) => {
