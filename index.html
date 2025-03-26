@@ -1,140 +1,72 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <!-- 在head部分添加 -->
-<script>
-// 定义视频URL数组
-const VIDEO_URLS = [
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/1%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/2%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/3%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/4%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/5%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/6%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/7%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/8%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/9%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/10%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/11%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/12%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/13%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/14%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/15%E9%A2%98.mp4'
-   
-];
-
-// 注册Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(reg => {
-                console.log('Service Worker 注册成功');
-                
-                // 初始化缓存状态检查
-                checkCacheStatus();
-                
-                // 每24小时检查更新
-                setInterval(() => {
-                    updateCache().catch(console.error);
-                }, 86400000);
-            })
-            .catch(console.error);
-    });
-}
-
-// 缓存状态检查
-async function checkCacheStatus() {
-    if (!navigator.serviceWorker) return;
-    
-    const container = document.createElement('div');
-    container.id = 'video-cache-status';
-    container.style.position = 'fixed';
-    container.style.bottom = '10px';
-    container.style.right = '10px';
-    container.style.background = 'rgba(108, 92, 231, 0.9)';
-    container.style.color = 'white';
-    container.style.padding = '10px';
-    container.style.borderRadius = '5px';
-    container.style.zIndex = '1000';
-    container.style.fontSize = '14px';
-    
-    document.body.appendChild(container);
-    
-    await updateCacheDisplay();
-}
-
-async function updateCacheDisplay() {
-    const container = document.getElementById('video-cache-status');
-    if (!container) return;
-    
-    try {
-        const cache = await caches.open('scratch-videos-v2');
-        const requests = await cache.keys();
-        
-        const cachedCount = requests.length;
-        const totalCount = VIDEO_URLS.length;
-        
-        container.innerHTML = `
-            <div>视频缓存: ${cachedCount}/${totalCount}</div>
-            <div style="margin-top:5px;font-size:12px;">
-                <a href="#" onclick="updateCache()" style="color:white;">更新</a> | 
-                <a href="#" onclick="clearCache()" style="color:white;">清除</a>
-            </div>
-        `;
-    } catch (error) {
-        container.innerHTML = '缓存状态不可用';
-    }
-}
-
-// 更新缓存
-async function updateCache() {
-    if (!navigator.serviceWorker) return;
-    
-    const statusEl = document.getElementById('video-cache-status');
-    if (statusEl) statusEl.innerHTML = '正在更新缓存...';
-    
-    try {
-        const reg = await navigator.serviceWorker.ready;
-        await new Promise((resolve) => {
-            const channel = new MessageChannel();
-            channel.port1.onmessage = (e) => {
-                if (e.data.status === 'complete') {
-                    resolve();
-                }
-            };
-            reg.active.postMessage(
-                { action: 'UPDATE_VIDEOS' },
-                [channel.port2]
-            );
-        });
-        
-        if (statusEl) {
-            statusEl.innerHTML = '缓存更新完成!';
-            setTimeout(updateCacheDisplay, 2000);
-        }
-    } catch (error) {
-        if (statusEl) statusEl.innerHTML = '更新失败';
-        console.error('缓存更新失败:', error);
-    }
-}
-
-// 清除缓存
-async function clearCache() {
-    if (confirm('确定要清除所有视频缓存吗？')) {
-        try {
-            await caches.delete('scratch-videos-v2');
-            await updateCacheDisplay();
-        } catch (error) {
-            console.error('清除缓存失败:', error);
-        }
-    }
-}
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>“角角向前冲”大闯关</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- 缓存管理模块 -->
+    <script type="module">
+        import { cacheHandler } from './scripts/cache-handler.js';
+        
+        // 定义全局缓存函数
+        window.updateCache = cacheHandler.updateCache.bind(cacheHandler);
+        window.clearCache = cacheHandler.clearCache.bind(cacheHandler);
+        
+        // 注册Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => {
+                        console.log('Service Worker 注册成功');
+                        checkCacheStatus();
+                        setInterval(() => updateCache().catch(console.error), 86400000);
+                    })
+                    .catch(console.error);
+            });
+        }
+
+        // 缓存状态检查
+        async function checkCacheStatus() {
+            if (!navigator.serviceWorker) return;
+            
+            const container = document.getElementById('video-cache-status') || createStatusContainer();
+            const status = await cacheHandler.checkCacheStatus();
+            
+            if (status) {
+                container.innerHTML = `
+                    <div>视频缓存: ${status.cachedCount}/${status.totalCount}</div>
+                    <div style="margin-top:5px;font-size:12px;">
+                        <a href="#" onclick="updateCache()" style="color:white;">更新</a> | 
+                        <a href="#" onclick="clearCache()" style="color:white;">清除</a>
+                    </div>
+                    ${status.cachedCount === 0 ? 
+                      '<div style="color:#ff9eb7;margin-top:5px;">首次加载较慢，请耐心等待...</div>' : ''}
+                `;
+            } else {
+                container.innerHTML = '缓存状态不可用';
+            }
+        }
+
+        function createStatusContainer() {
+            const container = document.createElement('div');
+            container.id = 'video-cache-status';
+            container.style.position = 'fixed';
+            container.style.bottom = '10px';
+            container.style.right = '10px';
+            container.style.background = 'rgba(108, 92, 231, 0.9)';
+            container.style.color = 'white';
+            container.style.padding = '10px';
+            container.style.borderRadius = '5px';
+            container.style.zIndex = '1000';
+            container.style.fontSize = '14px';
+            document.body.appendChild(container);
+            return container;
+        }
+    </script>
+
     <style>
         :root {
             --primary-color: #6c5ce7;
