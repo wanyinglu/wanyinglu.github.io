@@ -1,11 +1,14 @@
 const CACHE_NAME = 'scratch-videos-v3';
-const VIDEO_URLS = [/* 你的视频URL数组 */];
+const VIDEO_URLS = [
+  'https://raw.githubusercontent.com/wanyinglu/wanyinglu/main/1题.mp4',
+  // ...其他视频URL...
+];
 
-// 安装阶段 - 仅预缓存
+// 安装阶段 - 预缓存
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(VIDEO_URLS.slice(0, 3))) // 只缓存前3个视频
+      .then(cache => cache.addAll(VIDEO_URLS.slice(0, 3)))
       .then(() => self.skipWaiting())
       .catch(err => console.error('预缓存失败:', err))
   );
@@ -21,34 +24,44 @@ self.addEventListener('activate', event => {
       .then(() => self.clients.claim())
   );
 });
+
+// 工具函数
+function createFallbackResponse() {
+  return new Response('<svg>视频加载中...</svg>', {
+    headers: {'Content-Type': 'image/svg+xml'}
+  });
+}
+
+// 请求拦截
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-  
-  // 仅拦截视频请求
-  if (VIDEO_URLS.some(videoUrl => url.href.includes(videoUrl))) {
+  const url = event.request.url;
+
+  // 动态替换 scratch-cw.top 的视频请求
+  if (url.includes('scratch-cw.top/video')) {
+    const videoNum = url.match(/video\/(\d+)\.mp4/)?.[1];
+    if (videoNum) {
+      const realUrl = `https://raw.githubusercontent.com/wanyinglu/wanyinglu/main/${videoNum}题.mp4`;
+      event.respondWith(
+        fetch(realUrl, { mode: 'no-cors' })
+          .then(res => {
+            if (res.ok || res.type === 'opaque') {
+              const cacheCopy = res.clone();
+              caches.open(CACHE_NAME).then(cache => cache.put(event.request, cacheCopy));
+            }
+            return res;
+          })
+          .catch(() => createFallbackResponse())
+      );
+      return;
+    }
+  }
+
+  // 处理其他视频请求
+  if (VIDEO_URLS.some(videoUrl => url.includes(videoUrl))) {
     event.respondWith(
       caches.match(event.request)
-        .then(cached => {
-          if (cached) {
-            console.log('从缓存返回:', event.request.url);
-            return cached;
-          }
-          // 网络请求并缓存
-          return fetch(event.request)
-            .then(networkRes => {
-              const cacheCopy = networkRes.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => cache.put(event.request, cacheCopy));
-              return networkRes;
-            })
-            .catch(() => {
-              console.warn('网络请求失败，返回备用响应');
-              return new Response('<svg>视频加载中...</svg>', { 
-                headers: { 'Content-Type': 'image/svg+xml' } 
-              });
-            });
-        })
+        .then(cached => cached || fetch(event.request))
+        .catch(() => createFallbackResponse())
     );
   }
-  // 非视频请求直接放行
 });
