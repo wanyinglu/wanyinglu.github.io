@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+    <script>
+// 监听Scratch视频加载事件
+window.addEventListener('load', () => {
+  const originalCreateElement = document.createElement;
+  document.createElement = function(tagName) {
+    const element = originalCreateElement.call(this, tagName);
+    if (tagName.toLowerCase() === 'video') {
+      element.addEventListener('loadstart', () => {
+        console.log('视频开始加载:', element.src);
+        if (element.src.includes('.mp4')) {
+          fetch(element.src, { mode: 'no-cors' })
+            .then(res => caches.open('scratch-videos-v3')
+              .then(cache => cache.put(element.src, res)));
+        }
+      });
+    }
+    return element;
+  };
+});
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>“角角向前冲”大闯关</title>
