@@ -21,3 +21,16 @@ self.addEventListener('activate', event => {
       .then(() => self.clients.claim())
   );
 });
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  
+  // 仅拦截视频请求
+  if (VIDEO_URLS.some(videoUrl => url.href.includes(videoUrl))) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(cached => cached || fetch(event.request))
+        .catch(() => new Response('视频加载失败'))
+    );
+  }
+  // 其他请求直接放行
+});
