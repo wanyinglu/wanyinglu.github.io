@@ -3,26 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>“角角向前冲”大闯关 - 优化版</title>
+    <title>“角角向前冲”大闯关 - 极速版</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
         :root {
             --primary-color: #6c5ce7;
             --primary-light: #a29bfe;
             --primary-dark: #5649c0;
             --accent-color: #fd79a8;
-            --accent-light: #ff9eb7;
             --dark-color: #2d3436;
             --light-color: #f5f6fa;
             --gray-color: #636e72;
-            --success-color: #00b894;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
         
         body {
@@ -32,316 +23,43 @@
             padding: 20px;
             text-align: center;
             color: var(--dark-color);
-            position: relative;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            background: var(--light-color);
         }
         
-        /* 粒子画布容器 */
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            background: linear-gradient(135deg, #f9f9ff 0%, #e6e9ff 100%);
-        }
-        
-        /* 导航栏 */
-        .navbar {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            margin-bottom: 30px;
-        }
-        
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo-icon {
-            margin-right: 10px;
-            font-size: 1.8rem;
-        }
-        
-        /* 主标题 */
-        .hero {
-            margin: 30px 0 40px;
-            max-width: 800px;
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(2px);
-            border-radius: 10px;
-            padding: 20px;
-        }
-        
-        h1 {
-            color: var(--primary-dark);
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-            position: relative;
-            display: inline-block;
-        }
-        
-        h1 .highlight {
-            color: var(--accent-color);
-            position: relative;
-        }
-        
-        h1 .highlight::after {
-            content: "";
-            position: absolute;
-            bottom: 5px;
-            left: 0;
-            width: 100%;
-            height: 10px;
-            background: rgba(253, 121, 168, 0.2);
-            z-index: -1;
-            border-radius: 5px;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--gray-color);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        /* 游戏容器 */
-        .game-container {
-            margin: 30px auto;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(8px);
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.3);
-            width: fit-content;
-        }
-        
-        .game-container:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-        }
-        
-        iframe {
-            border-radius: 10px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        /* 游戏信息卡片 */
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 800px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .info-card {
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(8px);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            flex: 1;
-            min-width: 250px;
-            border: 1px solid rgba(255,255,255,0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .info-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-        }
-        
-        .info-card h3 {
-            color: var(--primary-dark);
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .info-card h3 .icon {
-            margin-right: 10px;
-            color: var(--accent-color);
-        }
-        
-        .info-card p {
-            color: var(--gray-color);
-            line-height: 1.6;
-        }
-        
-        /* 操作按钮 */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin: 30px 0;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-            font-size: 1rem;
-        }
-        
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-        }
-        
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-light);
-        }
-        
-        .btn-outline:hover {
-            background: rgba(162, 155, 254, 0.1);
-            transform: translateY(-3px);
-        }
-        
-        .btn-icon {
-            margin-right: 8px;
-        }
-        
-        /* 页脚 */
-        footer {
-            width: 100%;
-            margin-top: 60px;
-            padding: 30px 0;
-            color: var(--gray-color);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(0,0,0,0.08);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(2px);
-            border-radius: 10px;
-        }
-        
-        .copyright {
-            margin-top: 10px;
-        }
-        
-        /* 动画效果 */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate {
-            animation: fadeInUp 0.8s ease-out forwards;
-        }
-        
-        .delay-1 { animation-delay: 0.2s; }
-        .delay-2 { animation-delay: 0.4s; }
-        .delay-3 { animation-delay: 0.6s; }
-        .delay-4 { animation-delay: 0.8s; }
-        
-        /* 游戏指南模态框 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            animation: modalFadeIn 0.3s ease-out;
-        }
-        
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray-color);
-            transition: color 0.3s;
-        }
-        
-        .close-modal:hover {
-            color: var(--primary-color);
-        }
-        
-        /* 加载进度条 */
+        /* 加载界面样式 */
         #loading-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255,255,255,0.95);
+            background: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1001;
-            transition: opacity 0.5s ease-out;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
         }
         
-        #loading-progress {
-            width: 80%;
+        #loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             max-width: 400px;
-            height: 20px;
+            width: 90%;
+        }
+        
+        #progress-container {
+            width: 100%;
+            height: 8px;
             background: #eee;
-            border-radius: 10px;
+            border-radius: 4px;
             margin: 20px 0;
             overflow: hidden;
         }
@@ -353,168 +71,97 @@
             transition: width 0.3s ease;
         }
         
-        #loading-text {
-            margin-top: 10px;
-            color: var(--gray-color);
+        #skip-btn {
+            margin-top: 20px;
+            padding: 8px 20px;
+            background: white;
+            border: 1px solid var(--primary-light);
+            border-radius: 20px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #skip-btn:hover {
+            background: var(--primary-light);
+            color: white;
         }
         
         .network-status {
             margin-top: 15px;
-            padding: 8px 15px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.9em;
+            color: var(--gray-color);
         }
         
-        .network-status.good {
-            color: var(--success-color);
+        /* 游戏内容样式 (默认隐藏) */
+        #game-content {
+            display: none;
+            width: 100%;
         }
         
-        .network-status.average {
-            color: orange;
+        .game-container {
+            margin: 30px auto;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            padding: 20px;
+            width: fit-content;
         }
         
-        .network-status.poor {
-            color: #ff4757;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .game-info {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .info-card {
-                width: 100%;
-            }
-            
-            .navbar {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
+        iframe {
+            border-radius: 10px;
+            border: none;
         }
     </style>
 </head>
 <body>
+    <!-- 极速加载界面 -->
+    <div id="loading-container">
+        <div id="loading-content">
+            <h2>正在准备游戏...</h2>
+            <p id="loading-text">初始化游戏环境中</p>
+            
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            
+            <button id="skip-btn">跳过加载直接开始</button>
+            
+            <p class="network-status" id="network-status">
+                <span id="network-icon">🌐</span> 检测网络连接...
+            </p>
+        </div>
+    </div>
+    
+    <!-- 游戏主要内容 (初始隐藏) -->
+    <div id="game-content">
+        <nav class="navbar">
+            <a href="#" class="logo">
+                <span>🎮 角角向前冲</span>
+            </a>
+        </nav>
+        
+        <section class="hero">
+            <h1>开启你的<span style="color:var(--accent-color)">冒险之旅</span></h1>
+            <p class="subtitle">《"角角向前冲"大闯关》极速版 - 无需漫长等待</p>
+        </section>
+        
+        <div class="game-container">
+            <iframe 
+                src="https://www.scratch-cw.top/projects/4347/embed" 
+                allowtransparency="true" 
+                width="485" 
+                height="402" 
+                frameborder="0" 
+                scrolling="no" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+    
     <!-- 视频预加载容器 (隐藏) -->
     <div id="video-preload" style="display:none;"></div>
-    
-    <!-- 加载进度界面 -->
-    <div id="loading-container">
-        <h2>正在优化加载游戏资源...</h2>
-        <div id="loading-progress">
-            <div id="progress-bar"></div>
-        </div>
-        <p id="loading-text">0/15 视频加载中</p>
-        <p id="network-status" class="network-status">检测网络连接质量...</p>
-        <p id="loading-tip" style="margin-top:20px;color:var(--gray-color);font-size:0.9rem;">
-            正在智能优化视频加载顺序，请稍候...
-        </p>
-    </div>
-    
-    <!-- 粒子背景容器 -->
-    <div id="particles-js"></div>
-    
-    <!-- 导航栏 -->
-    <nav class="navbar animate">
-        <a href="#" class="logo">
-            <span class="logo-icon">🎮</span>
-            <span>角角向前冲</span>
-        </a>
-    </nav>
-    
-    <!-- 主标题区 -->
-    <section class="hero animate delay-1">
-        <h1>开启你的<span class="highlight">冒险之旅</span></h1>
-        <p class="subtitle">《"角角向前冲"大闯关》优化版 - 所有解析视频已预加载，播放更流畅</p>
-        
-        <div class="action-buttons">
-            <a href="#play" class="btn btn-primary" id="play-btn">
-                <span class="btn-icon">▶</span>
-                <span>开始游戏</span>
-            </a>
-            <a href="#guide" class="btn btn-outline" id="guide-btn">
-                <span class="btn-icon">📖</span>
-                <span>游戏指南</span>
-            </a>
-        </div>
-    </section>
-    
-    <!-- 游戏信息卡片 -->
-    <div class="game-info">
-        <div class="info-card animate delay-2">
-            <h3><span class="icon">⚡</span>性能优化</h3>
-            <p>采用智能分段预加载技术，确保所有视频流畅播放</p>
-        </div>
-        <div class="info-card animate delay-3">
-            <h3><span class="icon">🌐</span>网络自适应</h3>
-            <p>自动检测网络状况，动态调整视频加载策略</p>
-        </div>
-    </div>
-    
-    <!-- 游戏容器 -->
-    <div id="play" class="game-container animate delay-4">
-        <iframe 
-            src="https://www.scratch-cw.top/projects/4347/embed" 
-            allowtransparency="true" 
-            width="485" 
-            height="402" 
-            frameborder="0" 
-            scrolling="no" 
-            allowfullscreen>
-        </iframe>
-    </div>
-    
-    <!-- 游戏指南模态框 -->
-    <div id="guide-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>📚 游戏指南 & 优化说明</h2>
-            <div class="guide-section">
-                <h3>🎮 基本操作</h3>
-                <ol>
-                    <li>点击绿旗开始游戏</li>
-                    <li>在输入填空题的答案后，请点击屏幕上出现的"确认提交"按键提交</li>
-                </ol>
-                
-                <h3>🎥 视频优化说明</h3>
-                <ul>
-                    <li><strong>智能预加载</strong>：所有解析视频已提前加载</li>
-                    <li><strong>分段加载</strong>：优先加载前几个视频，其余延迟加载</li>
-                    <li><strong>网络自适应</strong>：根据您的网速自动调整加载策略</li>
-                    <li><strong>内存管理</strong>：自动释放不使用的视频资源</li>
-                </ul>
-                
-                <h3>⚠️ 常见问题</h3>
-                <ul>
-                    <li>如果视频仍加载缓慢，请检查网络连接</li>
-                    <li>建议使用Chrome或Edge浏览器获得最佳体验</li>
-                    <li>首次加载后，后续访问会更快</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 页脚 -->
-    <footer class="animate delay-4">
-        <p class="copyright">游戏制作：wanyinglu | 优化版本v2.1</p>
-        <p>© 2025 《"角角向前冲"大闯关》版权所有 | 禁止商用或二次创作</p>
-    </footer>
 
     <script>
         // 视频资源列表
@@ -536,329 +183,92 @@
             "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/15%E9%A2%98.mp4"
         ];
         
-        // 视频预加载管理器
-        class VideoPreloader {
-            constructor() {
-                this.videoElements = {};
-                this.loadedCount = 0;
-                this.totalVideos = videoUrls.length;
-                this.isLowBandwidth = false;
-                this.priorityLoaded = false;
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingContainer = document.getElementById('loading-container');
+            const gameContent = document.getElementById('game-content');
+            const progressBar = document.getElementById('progress-bar');
+            const loadingText = document.getElementById('loading-text');
+            const skipBtn = document.getElementById('skip-btn');
+            const networkStatus = document.getElementById('network-status');
+            const networkIcon = document.getElementById('network-icon');
             
-            init() {
-                this.checkNetwork();
-                this.updateNetworkStatus();
-                this.startPreloading();
-            }
+            // 1. 设置10秒超时自动继续
+            const timeout = setTimeout(() => {
+                finishLoading();
+            }, 10000);
             
-            checkNetwork() {
-                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-                if (connection) {
-                    this.isLowBandwidth = ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
-                    console.log(`网络类型: ${connection.effectiveType}, 低带宽模式: ${this.isLowBandwidth}`);
-                    
-                    // 监听网络变化
-                    connection.addEventListener('change', () => {
-                        this.isLowBandwidth = ['slow-2g', '2g', '3g'].includes(connection.effectiveType);
-                        this.updateNetworkStatus();
-                        console.log(`网络变更为: ${connection.effectiveType}`);
-                    });
+            // 2. 跳过按钮功能
+            skipBtn.addEventListener('click', finishLoading);
+            
+            // 3. 检测网络状态
+            function checkNetwork() {
+                const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (conn) {
+                    if (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') {
+                        networkStatus.innerHTML = '<span>⚠️ 网络较慢，建议连接WiFi</span>';
+                        networkIcon.textContent = '🐢';
+                    } else {
+                        networkStatus.innerHTML = '<span>✓ 网络连接正常</span>';
+                        networkIcon.textContent = '🚀';
+                    }
                 }
             }
             
-            updateNetworkStatus() {
-                const statusElement = document.getElementById('network-status');
-                if (this.isLowBandwidth) {
-                    statusElement.textContent = '网络状态: 较慢 (已启用优化模式)';
-                    statusElement.className = 'network-status poor';
-                    document.getElementById('loading-tip').textContent = '检测到较慢网络，已启用低带宽优化模式...';
-                } else {
-                    statusElement.textContent = '网络状态: 良好';
-                    statusElement.className = 'network-status good';
-                }
-            }
-            
-            startPreloading() {
-                // 第一阶段：立即加载前3个视频
-                this.loadPriorityVideos();
+            // 4. 极速加载策略
+            function startLoading() {
+                checkNetwork();
                 
-                // 第二阶段：延迟加载其他视频
+                // 立即显示部分进度
+                progressBar.style.width = '30%';
+                loadingText.textContent = '加载核心资源...';
+                
+                // 只预加载前2个关键视频
+                let loadedCount = 0;
+                for (let i = 0; i < 2; i++) {
+                    const video = document.createElement('video');
+                    video.src = videoUrls[i];
+                    video.preload = 'auto';
+                    video.style.display = 'none';
+                    
+                    video.addEventListener('loadeddata', () => {
+                        loadedCount++;
+                        progressBar.style.width = `${30 + (loadedCount * 20)}%`;
+                        
+                        if (loadedCount >= 2) {
+                            loadingText.textContent = '准备完成！';
+                            finishLoading();
+                        }
+                    });
+                    
+                    document.getElementById('video-preload').appendChild(video);
+                }
+                
+                // 后台静默加载其他视频
                 setTimeout(() => {
-                    this.loadRemainingVideos();
+                    for (let i = 2; i < videoUrls.length; i++) {
+                        const video = document.createElement('video');
+                        video.src = videoUrls[i];
+                        video.preload = 'auto';
+                        video.style.display = 'none';
+                        document.getElementById('video-preload').appendChild(video);
+                    }
                 }, 2000);
             }
             
-            loadPriorityVideos() {
-                for (let i = 0; i < Math.min(3, this.totalVideos); i++) {
-                    this.loadVideo(i, true);
-                }
-            }
-            
-            loadRemainingVideos() {
-                // 错开加载时间，避免同时请求过多
-                for (let i = 3; i < this.totalVideos; i++) {
-                    setTimeout(() => {
-                        this.loadVideo(i, false);
-                    }, i * 300); // 错开加载时间
-                }
-            }
-            
-            loadVideo(index, isPriority) {
-                const video = document.createElement('video');
-                video.id = `video${index}`;
-                video.preload = 'auto';
-                video.playsInline = true;
-                video.muted = true; // 静音预加载减少资源占用
+            // 完成加载
+            function finishLoading() {
+                clearTimeout(timeout);
+                loadingContainer.style.opacity = '0';
                 
-                // 优化预加载设置
-                video.setAttribute('preload', 'auto');
-                video.setAttribute('webkit-playsinline', '');
-                video.setAttribute('x-webkit-airplay', 'allow');
-                
-                // 重要：先设置src为空，再异步设置真实URL
-                video.src = '';
                 setTimeout(() => {
-                    video.src = videoUrls[index];
-                }, 0);
-                
-                video.addEventListener('loadeddata', () => this.onVideoLoaded(index, isPriority));
-                video.addEventListener('error', () => this.onVideoError(index));
-                
-                document.getElementById('video-preload').appendChild(video);
-                this.videoElements[index] = video;
+                    loadingContainer.style.display = 'none';
+                    gameContent.style.display = 'block';
+                }, 500);
             }
             
-            onVideoLoaded(index, isPriority) {
-                this.loadedCount++;
-                updateProgress(this.loadedCount);
-                
-                if (isPriority && !this.priorityLoaded) {
-                    this.priorityLoaded = true;
-                    document.getElementById('loading-tip').textContent = '关键视频已加载完成，可以开始游戏了...';
-                }
-                
-                // 关键视频额外缓存
-                if (isPriority) {
-                    this.videoElements[index].load();
-                }
-            }
-            
-            onVideoError(index) {
-                console.error(`视频${index+1}加载失败`);
-                this.loadedCount++; // 继续进度
-                updateProgress(this.loadedCount);
-            }
-        }
-        
-        // 更新加载进度
-        function updateProgress(loaded) {
-            const progress = Math.round((loaded / videoUrls.length) * 100);
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('loading-text').textContent = `${loaded}/${videoUrls.length} 视频加载中`;
-            
-            if (loaded === videoUrls.length) {
-                document.getElementById('loading-tip').textContent = '所有资源加载完成！即将进入游戏...';
-                setTimeout(() => {
-                    document.getElementById('loading-container').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('loading-container').style.display = 'none';
-                    }, 500);
-                }, 800);
-            }
-        }
-        
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化预加载器
-            const preloader = new VideoPreloader();
-            preloader.init();
-            
-            // 初始化粒子效果
-            initParticles();
-            
-            // 设置滚动动画
-            setupScrollAnimations();
-            
-            // 设置模态框交互
-            setupModalInteractions();
-            
-            // 控制台彩蛋
-            console.log("%c🚀 欢迎来到优化版"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
-            console.log("%c🔧 已启用高级视频预加载技术", "color:#00b894;");
+            // 启动加载流程
+            setTimeout(startLoading, 500); // 短暂延迟让界面先渲染
         });
-        
-        // 初始化粒子效果
-        function initParticles() {
-            particlesJS('particles-js', {
-                "particles": {
-                    "number": {
-                        "value": 60,
-                        "density": {
-                            "enable": true,
-                            "value_area": 800
-                        }
-                    },
-                    "color": {
-                        "value": "#a29bfe"
-                    },
-                    "shape": {
-                        "type": "circle",
-                        "stroke": {
-                            "width": 0,
-                            "color": "#000000"
-                        }
-                    },
-                    "opacity": {
-                        "value": 0.3,
-                        "random": false,
-                        "anim": {
-                            "enable": false
-                        }
-                    },
-                    "size": {
-                        "value": 3,
-                        "random": false,
-                        "anim": {
-                            "enable": false
-                        }
-                    },
-                    "line_linked": {
-                        "enable": false
-                    },
-                    "move": {
-                        "enable": true,
-                        "speed": 1,
-                        "direction": "none",
-                        "random": false,
-                        "straight": false,
-                        "out_mode": "out",
-                        "bounce": false,
-                        "attract": {
-                            "enable": false
-                        }
-                    }
-                },
-                "interactivity": {
-                    "detect_on": "canvas",
-                    "events": {
-                        "onhover": {
-                            "enable": true,
-                            "mode": "repulse"
-                        },
-                        "onclick": {
-                            "enable": true,
-                            "mode": "bubble"
-                        },
-                        "resize": true
-                    },
-                    "modes": {
-                        "repulse": {
-                            "distance": 100,
-                            "duration": 0.4
-                        },
-                        "bubble": {
-                            "distance": 200,
-                            "size": 10,
-                            "duration": 2,
-                            "opacity": 0.8,
-                            "speed": 3
-                        }
-                    }
-                },
-                "retina_detect": true
-            });
-        }
-        
-        // 设置滚动动画
-        function setupScrollAnimations() {
-            const animateElements = document.querySelectorAll('.animate');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = 1;
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, { threshold: 0.1 });
-            
-            animateElements.forEach(el => {
-                el.style.opacity = 0;
-                el.style.transform = 'translateY(30px)';
-                el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                observer.observe(el);
-            });
-        }
-        
-        // 设置模态框交互
-        function setupModalInteractions() {
-            const guideBtn = document.getElementById('guide-btn');
-            const guideModal = document.getElementById('guide-modal');
-            const closeButtons = document.querySelectorAll('.close-modal');
-            
-            guideBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                guideModal.style.display = 'flex';
-                particlesJS('particles-js', {
-                    particles: {
-                        color: { value: "#a29bfe" },
-                        opacity: { value: 0.6 },
-                        size: { value: 4 },
-                        line_linked: { 
-                            enable: true,
-                            opacity: 0.2,
-                            width: 1
-                        }
-                    }
-                });
-            });
-            
-            function restoreParticles() {
-                particlesJS('particles-js', {
-                    particles: {
-                        color: { value: "#a29bfe" },
-                        opacity: { value: 0.3 },
-                        size: { value: 3 },
-                        line_linked: { enable: false }
-                    }
-                });
-            }
-            
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    guideModal.style.display = 'none';
-                    restoreParticles();
-                });
-            });
-            
-            window.addEventListener('click', function(e) {
-                if (e.target === guideModal) {
-                    guideModal.style.display = 'none';
-                    restoreParticles();
-                }
-            });
-            
-            // 开始游戏按钮点击效果
-            document.getElementById('play-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                particlesJS('particles-js', {
-                    particles: {
-                        move: {
-                            speed: 3,
-                            attract: {
-                                enable: true,
-                                rotateX: 600,
-                                rotateY: 1200
-                            }
-                        }
-                    }
-                });
-                
-                document.querySelector('#play').scrollIntoView({ 
-                    behavior: 'smooth' 
-                });
-            });
-        }
     </script>
 </body>
 </html>
