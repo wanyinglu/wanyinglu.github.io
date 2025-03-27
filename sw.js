@@ -106,6 +106,7 @@ function isVideoRequest(request) {
     return VIDEO_URLS.some(videoUrl => 
         request.url.includes(videoUrl) || 
         (request.url.includes('scratch-cw.top') && request.url.includes('.mp4'))
+    );  // 添加缺失的括号
 }
 
 // 生成统一的缓存键
