@@ -32,36 +32,67 @@ function createFallbackResponse() {
   });
 }
 
-// 请求拦截
 self.addEventListener('fetch', event => {
   const url = event.request.url;
 
-  // 动态替换 scratch-cw.top 的视频请求
-  if (url.includes('scratch-cw.top/video')) {
-    const videoNum = url.match(/video\/(\d+)\.mp4/)?.[1];
-    if (videoNum) {
-      const realUrl = `https://raw.githubusercontent.com/wanyinglu/wanyinglu/main/${videoNum}题.mp4`;
-      event.respondWith(
-        fetch(realUrl, { mode: 'no-cors' })
-          .then(res => {
-            if (res.ok || res.type === 'opaque') {
-              const cacheCopy = res.clone();
-              caches.open(CACHE_NAME).then(cache => cache.put(event.request, cacheCopy));
-            }
-            return res;
-          })
-          .catch(() => createFallbackResponse())
-      );
-      return;
-    }
+  // 1. 仅处理视频请求（根据你的实际需求调整条件）
+  if (url.includes('.mp4') || event.request.headers.get('accept')?.includes('video')) {
+    event.respondWith(
+      handleVideoRequest(event.request)
+    );
+    return;
   }
 
-  // 处理其他视频请求
-  if (VIDEO_URLS.some(videoUrl => url.includes(videoUrl))) {
-    event.respondWith(
-      caches.match(event.request)
-        .then(cached => cached || fetch(event.request))
-        .catch(() => createFallbackResponse())
-    );
-  }
+  // 其他类型请求的处理...
 });
+
+// 专门处理视频请求的函数
+async function handleVideoRequest(request) {
+  // 忽略查询参数和hash的纯净URL
+  const cleanUrl = request.url.split(/[?#]/)[0];
+  
+  try {
+    // 1. 先尝试从缓存获取
+    const cached = await caches.match(cleanUrl);
+    if (cached) return cached;
+
+    // 2. 网络请求
+    const networkRes = await fetch(request);
+    
+    // 3. 处理206分片响应
+    if (networkRes.status === 206) {
+      return await mergePartialResponse(networkRes);
+    }
+
+    // 4. 缓存并返回正常响应
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put(cleanUrl, networkRes.clone());
+    return networkRes;
+
+  } catch (err) {
+    console.warn('视频请求失败:', request.url, err);
+    return createFallbackResponse();
+  }
+}
+
+// 合并206分片响应
+async function mergePartialResponse(response) {
+  const fullBuffer = await response.arrayBuffer();
+  const headers = new Headers(response.headers);
+  
+  // 移除分片相关头
+  headers.delete('content-range');
+  headers.set('content-length', fullBuffer.byteLength);
+  
+  return new Response(fullBuffer, {
+    status: 200,  // 改为完整状态码
+    headers
+  });
+}
+
+// 备用响应
+function createFallbackResponse() {
+  return new Response('<svg>视频加载中...</svg>', {
+    headers: { 'Content-Type': 'image/svg+xml' }
+  });
+}
