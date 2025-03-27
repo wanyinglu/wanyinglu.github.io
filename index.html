@@ -1,91 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-   <!-- 在<head>中添加 -->
-<script>
-// 强制启用 Service Worker 控制
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js', { 
-    scope: '/',
-    updateViaCache: 'none'
-  }).then(reg => {
-    reg.onupdatefound = () => {
-      reg.installing.onstatechange = () => {
-        if (reg.active) {
-          reg.active.postMessage('FORCE_CLAIM');
-          setTimeout(() => location.reload(), 300);
-        }
-      };
-    };
-  });
-}
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>“角角向前冲”大闯关</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    
-    <!-- 缓存管理模块 -->
-    <script type="module">
-        import { cacheHandler } from './scripts/cache-handler.js';
-        
-        // 定义全局缓存函数
-        window.updateCache = cacheHandler.updateCache.bind(cacheHandler);
-        window.clearCache = cacheHandler.clearCache.bind(cacheHandler);
-        
-        // 注册Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => {
-                        console.log('Service Worker 注册成功');
-                        checkCacheStatus();
-                        setInterval(() => updateCache().catch(console.error), 86400000);
-                    })
-                    .catch(console.error);
-            });
-        }
-
-        // 缓存状态检查
-        async function checkCacheStatus() {
-            if (!navigator.serviceWorker) return;
-            
-            const container = document.getElementById('video-cache-status') || createStatusContainer();
-            const status = await cacheHandler.checkCacheStatus();
-            
-            if (status) {
-                container.innerHTML = `
-                    <div>视频缓存: ${status.cachedCount}/${status.totalCount}</div>
-                    <div style="margin-top:5px;font-size:12px;">
-                        <a href="#" onclick="updateCache()" style="color:white;">更新</a> | 
-                        <a href="#" onclick="clearCache()" style="color:white;">清除</a>
-                    </div>
-                    ${status.cachedCount === 0 ? 
-                      '<div style="color:#ff9eb7;margin-top:5px;">首次加载较慢，请耐心等待...</div>' : ''}
-                `;
-            } else {
-                container.innerHTML = '缓存状态不可用';
-            }
-        }
-
-        function createStatusContainer() {
-            const container = document.createElement('div');
-            container.id = 'video-cache-status';
-            container.style.position = 'fixed';
-            container.style.bottom = '10px';
-            container.style.right = '10px';
-            container.style.background = 'rgba(108, 92, 231, 0.9)';
-            container.style.color = 'white';
-            container.style.padding = '10px';
-            container.style.borderRadius = '5px';
-            container.style.zIndex = '1000';
-            container.style.fontSize = '14px';
-            document.body.appendChild(container);
-            return container;
-        }
-    </script>
-
     <style>
         :root {
             --primary-color: #6c5ce7;
@@ -400,6 +320,44 @@ if ('serviceWorker' in navigator) {
             color: var(--primary-color);
         }
         
+        /* 加载进度条 */
+        #loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        #loading-progress {
+            width: 80%;
+            max-width: 400px;
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary-color));
+            transition: width 0.3s ease;
+        }
+        
+        #loading-text {
+            margin-top: 10px;
+            color: var(--gray-color);
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             h1 {
@@ -433,6 +391,18 @@ if ('serviceWorker' in navigator) {
     </style>
 </head>
 <body>
+    <!-- 视频预加载容器 (隐藏) -->
+    <div id="video-preload" style="display:none;"></div>
+    
+    <!-- 加载进度界面 -->
+    <div id="loading-container">
+        <h2>正在加载游戏资源...</h2>
+        <div id="loading-progress">
+            <div id="progress-bar"></div>
+        </div>
+        <p id="loading-text">0/15 视频加载中</p>
+    </div>
+    
     <!-- 粒子背景容器 -->
     <div id="particles-js"></div>
     
@@ -447,7 +417,7 @@ if ('serviceWorker' in navigator) {
     <!-- 主标题区 -->
     <section class="hero animate delay-1">
         <h1>开启你的<span class="highlight">冒险之旅</span></h1>
-        <p class="subtitle">《“角角向前冲”大闯关》是一款用Scratch制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
+        <p class="subtitle">《"角角向前冲"大闯关》是一款用Scratch制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
         
         <div class="action-buttons">
             <a href="#play" class="btn btn-primary" id="play-btn">
@@ -496,7 +466,7 @@ if ('serviceWorker' in navigator) {
                 <ol>
                     <li>点击绿旗开始游戏</li>
                     <li>在输入填空题的答案后，请点击屏幕上出现的"确认提交"按键提交</li>
-                    <li>初次加载使用时，答案解析加载视频可能缓慢，请同学们耐心等待，谢谢谅解</li>
+                    <li>答案解析视频已预加载，播放更流畅</li>
                 </ol>
             </div>
         </div>
@@ -505,12 +475,79 @@ if ('serviceWorker' in navigator) {
     <!-- 页脚 -->
     <footer class="animate delay-4">
         <p class="copyright">游戏制作：wanyinglu</p>
-        <p>© 2025 《“角角向前冲”大闯关》版权所有 | 禁止商用或二次创作</p>
+        <p>© 2025 《"角角向前冲"大闯关》版权所有 | 禁止商用或二次创作</p>
     </footer>
 
     <script>
-        // 初始化粒子效果
+        // 视频资源列表
+        const videoUrls = [
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/1%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/2%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/3%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/4%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/5%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/6%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/7%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/8%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/9%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/10%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/11%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/12%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/13%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/14%E9%A2%98.mp4",
+            "https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/15%E9%A2%98.mp4"
+        ];
+        
+        // 预加载视频
+        function preloadVideos() {
+            let loadedCount = 0;
+            
+            videoUrls.forEach((url, index) => {
+                const video = document.createElement('video');
+                video.src = url;
+                video.preload = 'auto';
+                
+                video.addEventListener('loadeddata', () => {
+                    loadedCount++;
+                    updateProgress(loadedCount);
+                    
+                    if (loadedCount === videoUrls.length) {
+                        // 所有视频加载完成
+                        setTimeout(() => {
+                            document.getElementById('loading-container').style.opacity = '0';
+                            setTimeout(() => {
+                                document.getElementById('loading-container').style.display = 'none';
+                            }, 500);
+                        }, 500);
+                    }
+                });
+                
+                video.addEventListener('error', () => {
+                    console.error(`视频加载失败: ${url}`);
+                    loadedCount++;
+                    updateProgress(loadedCount);
+                });
+                
+                document.getElementById('video-preload').appendChild(video);
+            });
+        }
+        
+        // 更新加载进度
+        function updateProgress(loaded) {
+            const progress = Math.round((loaded / videoUrls.length) * 100);
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('loading-text').textContent = `${loaded}/${videoUrls.length} 视频加载中`;
+        }
+        
+        // 页面加载完成后开始预加载
         document.addEventListener('DOMContentLoaded', function() {
+            // 先显示加载界面
+            document.getElementById('loading-container').style.display = 'flex';
+            
+            // 开始预加载视频
+            preloadVideos();
+            
+            // 初始化粒子效果
             particlesJS('particles-js', {
                 "particles": {
                     "number": {
@@ -683,7 +720,7 @@ if ('serviceWorker' in navigator) {
             });
             
             // 控制台彩蛋
-            console.log("%c🚀 欢迎来到“角角向前冲”大闯关！", "font-size:20px;color:#6c5ce7;");
+            console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
         });
     </script>
 </body>
