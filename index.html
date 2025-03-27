@@ -1,135 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <!-- 在head部分添加 -->
-<script>
-// 定义视频URL数组
-const VIDEO_URLS = [
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/1%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/2%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/3%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/4%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/5%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/6%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/7%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/8%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/9%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/10%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/11%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/12%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/13%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/14%E9%A2%98.mp4',
-    'https://raw.githubusercontent.com/wanyinglu/wanyinglu/refs/heads/main/15%E9%A2%98.mp4'
-   
-];
-
-// 注册Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(reg => {
-                console.log('Service Worker 注册成功');
-                
-                // 初始化缓存状态检查
-                checkCacheStatus();
-                
-                // 每24小时检查更新
-                setInterval(() => {
-                    updateCache().catch(console.error);
-                }, 86400000);
-            })
-            .catch(console.error);
-    });
-}
-
-// 缓存状态检查
-async function checkCacheStatus() {
-    if (!navigator.serviceWorker) return;
-    
-    const container = document.createElement('div');
-    container.id = 'video-cache-status';
-    container.style.position = 'fixed';
-    container.style.bottom = '10px';
-    container.style.right = '10px';
-    container.style.background = 'rgba(108, 92, 231, 0.9)';
-    container.style.color = 'white';
-    container.style.padding = '10px';
-    container.style.borderRadius = '5px';
-    container.style.zIndex = '1000';
-    container.style.fontSize = '14px';
-    
-    document.body.appendChild(container);
-    
-    await updateCacheDisplay();
-}
-
-async function updateCacheDisplay() {
-    const container = document.getElementById('video-cache-status');
-    if (!container) return;
-    
-    try {
-        const cache = await caches.open('scratch-videos-v2');
-        const requests = await cache.keys();
-        
-        const cachedCount = requests.length;
-        const totalCount = VIDEO_URLS.length;
-        
-        container.innerHTML = `
-            <div>视频缓存: ${cachedCount}/${totalCount}</div>
-            <div style="margin-top:5px;font-size:12px;">
-                <a href="#" onclick="updateCache()" style="color:white;">更新</a> | 
-                <a href="#" onclick="clearCache()" style="color:white;">清除</a>
-            </div>
-        `;
-    } catch (error) {
-        container.innerHTML = '缓存状态不可用';
-    }
-}
-
-// 更新缓存
-async function updateCache() {
-    if (!navigator.serviceWorker) return;
-    
-    const statusEl = document.getElementById('video-cache-status');
-    if (statusEl) statusEl.innerHTML = '正在更新缓存...';
-    
-    try {
-        const reg = await navigator.serviceWorker.ready;
-        await new Promise((resolve) => {
-            const channel = new MessageChannel();
-            channel.port1.onmessage = (e) => {
-                if (e.data.status === 'complete') {
-                    resolve();
-                }
-            };
-            reg.active.postMessage(
-                { action: 'UPDATE_VIDEOS' },
-                [channel.port2]
-            );
-        });
-        
-        if (statusEl) {
-            statusEl.innerHTML = '缓存更新完成!';
-            setTimeout(updateCacheDisplay, 2000);
-        }
-    } catch (error) {
-        if (statusEl) statusEl.innerHTML = '更新失败';
-        console.error('缓存更新失败:', error);
-    }
-}
-
-// 清除缓存
-async function clearCache() {
-    if (confirm('确定要清除所有视频缓存吗？')) {
-        try {
-            await caches.delete('scratch-videos-v2');
-            await updateCacheDisplay();
-        } catch (error) {
-            console.error('清除缓存失败:', error);
-        }
-    }
-}
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>“角角向前冲”大闯关</title>
@@ -449,6 +320,28 @@ async function clearCache() {
             color: var(--primary-color);
         }
         
+        /* 预加载相关样式 */
+        .preload-container {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+        }
+        
+        #loading-progress {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            z-index: 1000;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             h1 {
@@ -478,6 +371,12 @@ async function clearCache() {
                 width: 100%;
                 max-width: 300px;
             }
+            
+            #loading-progress {
+                bottom: 10px;
+                right: 10px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -496,7 +395,7 @@ async function clearCache() {
     <!-- 主标题区 -->
     <section class="hero animate delay-1">
         <h1>开启你的<span class="highlight">冒险之旅</span></h1>
-        <p class="subtitle">《“角角向前冲”大闯关》是一款用Scratch制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
+        <p class="subtitle">《"角角向前冲"大闯关》是一款用Scratch制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
         
         <div class="action-buttons">
             <a href="#play" class="btn btn-primary" id="play-btn">
@@ -554,12 +453,55 @@ async function clearCache() {
     <!-- 页脚 -->
     <footer class="animate delay-4">
         <p class="copyright">游戏制作：wanyinglu</p>
-        <p>© 2025 《“角角向前冲”大闯关》版权所有 | 禁止商用或二次创作</p>
+        <p>© 2025 《"角角向前冲"大闯关》版权所有 | 禁止商用或二次创作</p>
     </footer>
 
+    <!-- 视频预加载区域 -->
+    <div class="preload-container">
+        <!-- 预加载所有视频 -->
+        <video preload="auto" data-video-id="1"></video>
+        <video preload="auto" data-video-id="2"></video>
+        <video preload="auto" data-video-id="3"></video>
+        <video preload="auto" data-video-id="4"></video>
+        <video preload="auto" data-video-id="5"></video>
+        <video preload="auto" data-video-id="6"></video>
+        <video preload="auto" data-video-id="7"></video>
+        <video preload="auto" data-video-id="8"></video>
+        <video preload="auto" data-video-id="9"></video>
+        <video preload="auto" data-video-id="10"></video>
+        <video preload="auto" data-video-id="11"></video>
+        <video preload="auto" data-video-id="12"></video>
+        <video preload="auto" data-video-id="13"></video>
+        <video preload="auto" data-video-id="14"></video>
+        <video preload="auto" data-video-id="15"></video>
+    </div>
+    
+    <!-- 加载进度提示 -->
+    <div id="loading-progress">视频预加载中...</div>
+
     <script>
-        // 初始化粒子效果
+        // 视频URL列表 - 使用CDN加速
+        const VIDEO_URLS = [
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/1%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/2%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/3%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/4%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/5%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/6%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/7%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/8%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/9%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/10%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/11%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/12%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/13%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/14%E9%A2%98.mp4',
+            'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/15%E9%A2%98.mp4'
+        ];
+
+        // 初始化粒子效果和视频预加载
         document.addEventListener('DOMContentLoaded', function() {
+            // 粒子效果初始化
             particlesJS('particles-js', {
                 "particles": {
                     "number": {
@@ -731,8 +673,46 @@ async function clearCache() {
                 });
             });
             
+            // 视频预加载功能
+            const progressElement = document.getElementById('loading-progress');
+            let loadedCount = 0;
+            const totalVideos = VIDEO_URLS.length;
+            
+            // 设置视频源并监听加载事件
+            const videos = document.querySelectorAll('.preload-container video');
+            videos.forEach((video, index) => {
+                video.src = VIDEO_URLS[index];
+                video.setAttribute('data-video-id', index + 1);
+                
+                video.addEventListener('loadeddata', function() {
+                    loadedCount++;
+                    updateProgress();
+                });
+                
+                video.addEventListener('error', function() {
+                    console.error(`视频${index + 1}加载失败`);
+                    loadedCount++;
+                    updateProgress();
+                });
+            });
+            
+            // 更新加载进度
+            function updateProgress() {
+                const percent = Math.round((loadedCount / totalVideos) * 100);
+                progressElement.textContent = `视频预加载中... ${percent}%`;
+                
+                if (loadedCount === totalVideos) {
+                    setTimeout(() => {
+                        progressElement.textContent = '视频预加载完成！';
+                        setTimeout(() => {
+                            progressElement.style.display = 'none';
+                        }, 2000);
+                    }, 500);
+                }
+            }
+            
             // 控制台彩蛋
-            console.log("%c🚀 欢迎来到“角角向前冲”大闯关！", "font-size:20px;color:#6c5ce7;");
+            console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
         });
     </script>
 </body>
