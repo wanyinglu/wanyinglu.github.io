@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <script>
-// 监听Scratch视频加载事件
-window.addEventListener('load', () => {
-  const originalCreateElement = document.createElement;
-  document.createElement = function(tagName) {
-    const element = originalCreateElement.call(this, tagName);
-    if (tagName.toLowerCase() === 'video') {
-      element.addEventListener('loadstart', () => {
-        console.log('视频开始加载:', element.src);
-        if (element.src.includes('.mp4')) {
-          fetch(element.src, { mode: 'no-cors' })
-            .then(res => caches.open('scratch-videos-v3')
-              .then(cache => cache.put(element.src, res)));
+   <!-- 在<head>中添加 -->
+<script>
+// 强制启用 Service Worker 控制
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', { 
+    scope: '/',
+    updateViaCache: 'none'
+  }).then(reg => {
+    reg.onupdatefound = () => {
+      reg.installing.onstatechange = () => {
+        if (reg.active) {
+          reg.active.postMessage('FORCE_CLAIM');
+          setTimeout(() => location.reload(), 300);
         }
-      });
-    }
-    return element;
-  };
-});
+      };
+    };
+  });
+}
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
