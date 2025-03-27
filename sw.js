@@ -46,3 +46,15 @@ async function handleScratchVideo(request) {
     return new Response('', { status: 200 }); // 返回空响应避免WebGL报错
   }
 }
+// sw.js
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    clients.claim().then(() => {
+      console.log('Service Worker 已强制接管控制');
+      // 刷新所有客户端页面
+      clients.matchAll().then(clients => {
+        clients.forEach(client => client.navigate(client.url));
+      });
+    })
+  );
+});
