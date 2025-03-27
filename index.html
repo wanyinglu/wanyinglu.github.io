@@ -449,7 +449,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 页脚 -->
     <footer class="animate delay-4">
         <p class="copyright">游戏制作：wanyinglu</p>
@@ -498,6 +498,25 @@
             'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/14%E9%A2%98.mp4',
             'https://cdn.jsdelivr.net/gh/wanyinglu/wanyinglu@main/15%E9%A2%98.mp4'
         ];
+
+        // 关键资源缓存列表
+        const CACHE_RESOURCES = [
+            '/',
+            'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap',
+            'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js',
+            'https://www.scratch-cw.top/projects/4347/embed'
+        ];
+
+        // 注册Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker注册成功:', registration.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker注册失败:', err);
+                });
+            });
+        }
 
         // 初始化粒子效果和视频预加载
         document.addEventListener('DOMContentLoaded', function() {
@@ -673,33 +692,52 @@
                 });
             });
             
-            // 视频预加载功能
+            // 视频预加载功能 - 分段加载
             const progressElement = document.getElementById('loading-progress');
             let loadedCount = 0;
             const totalVideos = VIDEO_URLS.length;
+            const videosToLoadInitially = 3; // 初始加载3个视频
+            let currentLoadingIndex = 0;
             
-            // 设置视频源并监听加载事件
-            const videos = document.querySelectorAll('.preload-container video');
-            videos.forEach((video, index) => {
+            // 加载单个视频
+            function loadVideo(index) {
+                if (index >= totalVideos) return;
+                
+                const video = document.querySelector(`video[data-video-id="${index + 1}"]`);
                 video.src = VIDEO_URLS[index];
-                video.setAttribute('data-video-id', index + 1);
                 
                 video.addEventListener('loadeddata', function() {
                     loadedCount++;
                     updateProgress();
+                    // 加载下一个视频
+                    if (currentLoadingIndex < totalVideos - 1) {
+                        currentLoadingIndex++;
+                        setTimeout(() => loadVideo(currentLoadingIndex), 500);
+                    }
                 });
                 
                 video.addEventListener('error', function() {
                     console.error(`视频${index + 1}加载失败`);
                     loadedCount++;
                     updateProgress();
+                    // 即使失败也继续加载下一个
+                    if (currentLoadingIndex < totalVideos - 1) {
+                        currentLoadingIndex++;
+                        setTimeout(() => loadVideo(currentLoadingIndex), 500);
+                    }
                 });
-            });
+            }
+            
+            // 初始加载前3个视频
+            for (let i = 0; i < Math.min(videosToLoadInitially, totalVideos); i++) {
+                setTimeout(() => loadVideo(i), i * 300);
+                currentLoadingIndex = i;
+            }
             
             // 更新加载进度
             function updateProgress() {
                 const percent = Math.round((loadedCount / totalVideos) * 100);
-                progressElement.textContent = `视频预加载中... ${percent}%`;
+                progressElement.textContent = `视频预加载中... ${loadedCount}/${totalVideos} (${percent}%)`;
                 
                 if (loadedCount === totalVideos) {
                     setTimeout(() => {
