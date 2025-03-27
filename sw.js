@@ -28,9 +28,27 @@ self.addEventListener('fetch', event => {
   if (VIDEO_URLS.some(videoUrl => url.href.includes(videoUrl))) {
     event.respondWith(
       caches.match(event.request)
-        .then(cached => cached || fetch(event.request))
-        .catch(() => new Response('视频加载失败'))
+        .then(cached => {
+          if (cached) {
+            console.log('从缓存返回:', event.request.url);
+            return cached;
+          }
+          // 网络请求并缓存
+          return fetch(event.request)
+            .then(networkRes => {
+              const cacheCopy = networkRes.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => cache.put(event.request, cacheCopy));
+              return networkRes;
+            })
+            .catch(() => {
+              console.warn('网络请求失败，返回备用响应');
+              return new Response('<svg>视频加载中...</svg>', { 
+                headers: { 'Content-Type': 'image/svg+xml' } 
+              });
+            });
+        })
     );
   }
-  // 其他请求直接放行
+  // 非视频请求直接放行
 });
