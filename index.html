@@ -129,7 +129,7 @@
             padding: 20px;
             border: 1px solid rgba(255,255,255,0.3);
             width: fit-content;
-            position: relative; /* 为全屏按钮定位 */
+            position: relative;
         }
         
         .game-container:hover {
@@ -141,6 +141,7 @@
             border-radius: 10px;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
             border: 1px solid rgba(0,0,0,0.05);
+            display: block;
         }
         
         /* 全屏按钮样式 */
@@ -176,26 +177,28 @@
         body:fullscreen .game-container,
         body:-webkit-full-screen .game-container,
         body:-moz-full-screen .game-container {
-            width: 100%;
-            height: 100%;
-            max-width: none;
-            margin: 0;
-            padding: 0;
-            border-radius: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: white;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            background: white !important;
         }
         
-        body:fullscreen iframe,
-        body:-webkit-full-screen iframe,
-        body:-moz-full-screen iframe {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 0;
+        body:fullscreen .game-container iframe,
+        body:-webkit-full-screen .game-container iframe,
+        body:-moz-full-screen .game-container iframe {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            border-radius: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
         }
         
         /* 游戏信息卡片 */
@@ -664,12 +667,23 @@
             // 全屏功能实现
             const fullscreenBtn = document.getElementById('fullscreen-btn');
             const gameContainer = document.querySelector('.game-container');
+            const gameIframe = document.querySelector('.game-container iframe');
             
             function toggleFullscreen() {
                 if (!document.fullscreenElement) {
+                    // 进入全屏前保存原始尺寸
+                    gameIframe.dataset.originalWidth = gameIframe.width;
+                    gameIframe.dataset.originalHeight = gameIframe.height;
+                    
+                    // 移除iframe的固定尺寸属性
+                    gameIframe.removeAttribute('width');
+                    gameIframe.removeAttribute('height');
+                    
                     // 进入全屏
                     if (gameContainer.requestFullscreen) {
-                        gameContainer.requestFullscreen();
+                        gameContainer.requestFullscreen().catch(err => {
+                            console.error('全屏错误:', err);
+                        });
                     } else if (gameContainer.webkitRequestFullscreen) {
                         gameContainer.webkitRequestFullscreen();
                     } else if (gameContainer.msRequestFullscreen) {
@@ -688,17 +702,35 @@
             }
             
             // 监听全屏状态变化
-            document.addEventListener('fullscreenchange', updateFullscreenButton);
-            document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-            document.addEventListener('msfullscreenchange', updateFullscreenButton);
+            document.addEventListener('fullscreenchange', updateFullscreen);
+            document.addEventListener('webkitfullscreenchange', updateFullscreen);
+            document.addEventListener('msfullscreenchange', updateFullscreen);
             
-            function updateFullscreenButton() {
-                if (document.fullscreenElement || 
-                    document.webkitFullscreenElement || 
-                    document.msFullscreenElement) {
+            function updateFullscreen() {
+                const isFullscreen = document.fullscreenElement || 
+                                    document.webkitFullscreenElement || 
+                                    document.msFullscreenElement;
+                
+                if (isFullscreen) {
+                    // 全屏状态
                     fullscreenBtn.innerHTML = '<span class="icon">✕</span><span>退出全屏</span>';
+                    
+                    // 确保iframe填满全屏
+                    gameIframe.style.width = '100%';
+                    gameIframe.style.height = '100%';
                 } else {
+                    // 退出全屏状态
                     fullscreenBtn.innerHTML = '<span class="icon">⛶</span><span>全屏</span>';
+                    
+                    // 恢复原始尺寸
+                    if (gameIframe.dataset.originalWidth) {
+                        gameIframe.width = gameIframe.dataset.originalWidth;
+                    }
+                    if (gameIframe.dataset.originalHeight) {
+                        gameIframe.height = gameIframe.dataset.originalHeight;
+                    }
+                    gameIframe.style.width = '';
+                    gameIframe.style.height = '';
                 }
             }
             
