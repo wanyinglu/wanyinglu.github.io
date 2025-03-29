@@ -74,38 +74,6 @@
             font-size: 1.8rem;
         }
         
-        .nav-links {
-            display: flex;
-            gap: 25px;
-        }
-        
-        .nav-link {
-            color: var(--dark-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .nav-link:hover {
-            color: var(--primary-color);
-        }
-        
-        .nav-link::after {
-            content: "";
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-color);
-            transition: width 0.3s ease;
-        }
-        
-        .nav-link:hover::after {
-            width: 100%;
-        }
-        
         /* 主标题 */
         .hero {
             margin: 30px 0 40px;
@@ -287,22 +255,6 @@
             border-radius: 10px;
         }
         
-        .footer-links {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .footer-link {
-            color: var(--gray-color);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        
-        .footer-link:hover {
-            color: var(--primary-color);
-        }
-        
         .copyright {
             margin-top: 10px;
         }
@@ -410,11 +362,6 @@
             <span class="logo-icon">🎮</span>
             <span>角角向前冲</span>
         </a>
-        <div class="nav-links">
-            <a href="#" class="nav-link">首页</a>
-            <a href="#guide" class="nav-link">游戏指南</a>
-            <a href="#about" class="nav-link">关于</a>
-        </div>
     </nav>
     
     <!-- 主标题区 -->
@@ -465,36 +412,18 @@
             <span class="close-modal">&times;</span>
             <h2>📚 游戏指南</h2>
             <div class="guide-section">
-                <h3>←→ 移动控制</h3>
-                <p>使用键盘方向键或屏幕虚拟按钮控制角角移动</p>
-                <p><small>提示：长按方向键可以加速移动</small></p>
-            </div>
-            <div class="guide-section">
-                <h3>↑ 跳跃技巧</h3>
-                <p>按空格键或上方向键跳跃，时机准确可以二段跳</p>
-            </div>
-            <div class="guide-section">
-                <h3>⭐ 收集物品</h3>
-                <ul>
-                    <li>金色星星：+10分</li>
-                    <li>蓝色钻石：+50分</li>
-                    <li>红色药水：临时无敌</li>
-                </ul>
-            </div>
-            <div class="guide-section">
-                <h3>🎮 隐藏技巧</h3>
-                <p>在第三关开始时长按跳跃键5秒可解锁隐藏能力</p>
+                <h3>游戏操作说明</h3>
+                <ol>
+                    <li>点击绿旗开始游戏</li>
+                    <li>在输入填空题的答案后，请点击屏幕上出现的"确认提交"按键提交</li>
+                    <li>初次加载使用时，答案解析加载视频可能缓慢，请同学们耐心等待，谢谢谅解</li>
+                </ol>
             </div>
         </div>
     </div>
     
     <!-- 页脚 -->
     <footer class="animate delay-4">
-        <div class="footer-links">
-            <a href="#" class="footer-link">关于我们</a>
-            <a href="#" class="footer-link">使用条款</a>
-            <a href="#" class="footer-link">隐私政策</a>
-        </div>
         <p class="copyright">游戏制作：wanyinglu</p>
         <p>© 2025 《角角向前冲》版权所有 | 禁止商用或二次创作</p>
     </footer>
