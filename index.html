@@ -129,6 +129,7 @@
             padding: 20px;
             border: 1px solid rgba(255,255,255,0.3);
             width: fit-content;
+            position: relative; /* 为全屏按钮定位 */
         }
         
         .game-container:hover {
@@ -140,6 +141,61 @@
             border-radius: 10px;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
             border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        /* 全屏按钮样式 */
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: rgba(108, 92, 231, 0.8);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .fullscreen-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .fullscreen-btn .icon {
+            font-size: 1.1rem;
+        }
+        
+        /* 全屏模式下的样式 */
+        body:fullscreen .game-container,
+        body:-webkit-full-screen .game-container,
+        body:-moz-full-screen .game-container {
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+        }
+        
+        body:fullscreen iframe,
+        body:-webkit-full-screen iframe,
+        body:-moz-full-screen iframe {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 0;
         }
         
         /* 游戏信息卡片 */
@@ -350,30 +406,6 @@
                 max-width: 300px;
             }
         }
-
-        /* 全屏模式样式 */
-        .body-on-full-screen {
-            overflow: hidden;
-        }
-        .wrapper-on-full-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .iframe-on-full-screen {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 0;
-        }
     </style>
 </head>
 <body>
@@ -419,17 +451,19 @@
     
     <!-- 游戏容器 -->
     <div id="play" class="game-container animate delay-4">
-        <div id="showerwrapper">
-            <iframe id="shower" 
-                src="https://www.scratch-cw.top/projects/4347/embed" 
-                allowtransparency="true" 
-                width="485" 
-                height="402" 
-                frameborder="0" 
-                scrolling="no" 
-                allowfullscreen>
-            </iframe>
-        </div>
+        <iframe 
+            src="https://www.scratch-cw.top/projects/4347/embed" 
+            allowtransparency="true" 
+            width="485" 
+            height="402" 
+            frameborder="0" 
+            scrolling="no" 
+            allowfullscreen>
+        </iframe>
+        <button class="fullscreen-btn" id="fullscreen-btn">
+            <span class="icon">⛶</span>
+            <span>全屏</span>
+        </button>
     </div>
     
     <!-- 游戏指南模态框 -->
@@ -450,7 +484,7 @@
     <!-- 页脚 -->
     <footer class="animate delay-4">
         <p class="copyright">游戏制作：wanyinglu</p>
-        <p>© 2025 《“角角向前冲”大闯关》版权所有 | 禁止商用或二次创作</p>
+        <p>© 2025 《角角向前冲》版权所有 | 禁止商用或二次创作</p>
     </footer>
 
     <script>
@@ -627,29 +661,49 @@
                 });
             });
 
-            // 全屏功能处理
-            const hideScrollWhenFullScreen = true;
-            window.addEventListener("message", (event) => {
-                const iframe = document.querySelector("#shower");
-                const wrapper = document.querySelector("#showerwrapper");
-                if (event.data === "ScratchEmbedSetFullScreen") {
-                    if (wrapper && iframe) {
-                        if (hideScrollWhenFullScreen) {
-                            document.body.classList.add("body-on-full-screen");
-                        }
-                        wrapper.classList.add("wrapper-on-full-screen");
-                        iframe.classList.add("iframe-on-full-screen");
+            // 全屏功能实现
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const gameContainer = document.querySelector('.game-container');
+            
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    // 进入全屏
+                    if (gameContainer.requestFullscreen) {
+                        gameContainer.requestFullscreen();
+                    } else if (gameContainer.webkitRequestFullscreen) {
+                        gameContainer.webkitRequestFullscreen();
+                    } else if (gameContainer.msRequestFullscreen) {
+                        gameContainer.msRequestFullscreen();
                     }
-                } else if (event.data === "ScratchEmbedSetExitFullScreen") {
-                    if (wrapper && iframe) {
-                        if (hideScrollWhenFullScreen) {
-                            document.body.classList.remove("body-on-full-screen");
-                        }
-                        wrapper.classList.remove("wrapper-on-full-screen");
-                        iframe.classList.remove("iframe-on-full-screen");
+                } else {
+                    // 退出全屏
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
                     }
                 }
-            });
+            }
+            
+            // 监听全屏状态变化
+            document.addEventListener('fullscreenchange', updateFullscreenButton);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+            document.addEventListener('msfullscreenchange', updateFullscreenButton);
+            
+            function updateFullscreenButton() {
+                if (document.fullscreenElement || 
+                    document.webkitFullscreenElement || 
+                    document.msFullscreenElement) {
+                    fullscreenBtn.innerHTML = '<span class="icon">✕</span><span>退出全屏</span>';
+                } else {
+                    fullscreenBtn.innerHTML = '<span class="icon">⛶</span><span>全屏</span>';
+                }
+            }
+            
+            // 点击全屏按钮
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
             
             // 控制台彩蛋
             console.log("%c🚀 欢迎来到“角角向前冲”大闯关！", "font-size:20px;color:#6c5ce7;");
