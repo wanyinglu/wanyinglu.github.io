@@ -37,6 +37,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
         
         /* 粒子画布容器 */
@@ -289,6 +290,10 @@
             justify-content: center;
         }
         
+        .modal.active {
+            display: flex;
+        }
+        
         .modal-content {
             background: white;
             padding: 30px;
@@ -363,11 +368,16 @@
             height: 100%;
             z-index: 1000;
             background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .iframe-on-full-screen {
             width: 100%;
             height: 100%;
             border-radius: 0;
+            max-width: 100%;
+            max-height: 100%;
         }
     </style>
 </head>
@@ -389,14 +399,14 @@
         <p class="subtitle">《"角角向前冲"大闯关》是一款用Scratch制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
         
         <div class="action-buttons">
-            <a href="#play" class="btn btn-primary" id="play-btn">
+            <button class="btn btn-primary" id="play-btn">
                 <span class="btn-icon">▶</span>
                 <span>开始游戏</span>
-            </a>
-            <a href="#guide" class="btn btn-outline" id="guide-btn">
+            </button>
+            <button class="btn btn-outline" id="guide-btn">
                 <span class="btn-icon">📖</span>
                 <span>游戏指南</span>
-            </a>
+            </button>
         </div>
     </section>
     
@@ -433,7 +443,6 @@
             <span class="close-modal">&times;</span>
             <h2>📚 游戏指南</h2>
             <div class="guide-section">
-                <h3></h3>
                 <ol>
                     <li>点击绿旗开始游戏</li>
                     <li>在输入填空题的答案后，请点击屏幕上出现的"确认提交"按键提交</li>
@@ -550,14 +559,16 @@
                 observer.observe(el);
             });
             
-            // 游戏指南按钮点击
+            // 游戏指南按钮点击 - 修复版本
             const guideBtn = document.getElementById('guide-btn');
             const guideModal = document.getElementById('guide-modal');
-            const closeButtons = document.querySelectorAll('.close-modal');
+            const closeModalBtn = document.querySelector('.close-modal');
             
-            guideBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                guideModal.style.display = 'flex';
+            // 显示模态框
+            function showModal() {
+                guideModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
                 // 粒子特效变化 - 增强显示
                 particlesJS('particles-js', {
                     particles: {
@@ -571,10 +582,14 @@
                         }
                     }
                 });
-            });
+            }
             
-            // 关闭按钮点击
-            function restoreParticles() {
+            // 隐藏模态框
+            function hideModal() {
+                guideModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                
+                // 恢复粒子效果
                 particlesJS('particles-js', {
                     particles: {
                         color: { value: "#a29bfe" },
@@ -585,24 +600,21 @@
                 });
             }
             
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    guideModal.style.display = 'none';
-                    restoreParticles();
-                });
-            });
+            // 点击指南按钮
+            guideBtn.addEventListener('click', showModal);
+            
+            // 点击关闭按钮
+            closeModalBtn.addEventListener('click', hideModal);
             
             // 点击模态框外部关闭
-            window.addEventListener('click', function(e) {
+            guideModal.addEventListener('click', function(e) {
                 if (e.target === guideModal) {
-                    guideModal.style.display = 'none';
-                    restoreParticles();
+                    hideModal();
                 }
             });
             
             // 开始游戏按钮点击效果
             document.getElementById('play-btn').addEventListener('click', function(e) {
-                e.preventDefault();
                 // 粒子聚集效果
                 particlesJS('particles-js', {
                     particles: {
@@ -627,25 +639,30 @@
             console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
         });
 
-        // 全屏功能JS
-        const hideScrollWhenFullScreen = true; // 修改为false可以在全屏时显示页面总的滚动条，为true反之。
-        window.addEventListener("message", (event) => {
-            const iframe = document.querySelector("iframe#shower");
-            const wrapper = document.querySelector("div#showerwrapper");
+        // 全屏功能JS - 修复版本
+        const hideScrollWhenFullScreen = true;
+        window.addEventListener("message", function(event) {
+            const iframe = document.getElementById("shower");
+            const wrapper = document.getElementById("showerwrapper");
+            
+            if (!iframe || !wrapper) return;
+            
             if (event.data === "ScratchEmbedSetFullScreen") {
-                if (wrapper && iframe) {
-                    if (hideScrollWhenFullScreen)
-                        document.body.classList.add("body-on-full-screen"); // 添加 CSS 类
-                    wrapper.classList.add("wrapper-on-full-screen"); // 添加 CSS 类
-                    iframe.classList.add("iframe-on-full-screen"); // 添加 CSS 类
+                if (hideScrollWhenFullScreen) {
+                    document.body.classList.add("body-on-full-screen");
                 }
+                wrapper.classList.add("wrapper-on-full-screen");
+                iframe.classList.add("iframe-on-full-screen");
+                
+                // 确保iframe获得焦点
+                iframe.focus();
+                
             } else if (event.data === "ScratchEmbedSetExitFullScreen") {
-                if (wrapper && iframe) {
-                    if (hideScrollWhenFullScreen)
-                        document.body.classList.remove("body-on-full-screen"); // 移除 CSS 类
-                    wrapper.classList.remove("wrapper-on-full-screen"); // 移除 CSS 类
-                    iframe.classList.remove("iframe-on-full-screen"); // 移除 CSS 类
+                if (hideScrollWhenFullScreen) {
+                    document.body.classList.remove("body-on-full-screen");
                 }
+                wrapper.classList.remove("wrapper-on-full-screen");
+                iframe.classList.remove("iframe-on-full-screen");
             }
         });
     </script>
