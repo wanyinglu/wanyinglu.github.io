@@ -6,107 +6,96 @@
     <title>"角角向前冲"大闯关</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* 基础样式保持不变... */
-        
-        /* 针对Scratch创世界的特殊样式调整 */
-        #game-container {
-            position: relative;
-            width: 485px;
-            height: 402px;
-            margin: 0 auto;
-        }
-        
-        #game-iframe {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        /* 全屏模式专用样式 */
-        .fullscreen #game-container {
+        /* 保持您原有的所有样式不变 */
+        /* 仅添加模态框必要样式 */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 9999;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
             background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
         }
         
-        .fullscreen #game-iframe {
-            width: 100%;
-            height: 100%;
-            border-radius: 0;
-        }
-        
-        /* 游戏指南模态框样式 */
-        #guide-modal {
-            display: none;
-            position: fixed;
-            /* 其他样式保持不变 */
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <!-- 其他页面内容保持不变... -->
+    <!-- 保持您原有的所有HTML结构 -->
+    <!-- 仅确保有以下两个关键元素 -->
     
-    <!-- 专门针对Scratch创世界优化的游戏容器 -->
-    <div id="game-container">
-        <iframe id="game-iframe"
-               src="https://www.scratch-cw.top/projects/4347/embed"
-               allowfullscreen
-               scrolling="no"
-               frameborder="0"
-               width="485"
-               height="402"></iframe>
-    </div>
+    <!-- 游戏指南按钮（保持您原有的样式） -->
+    <a href="#" class="btn btn-outline" id="guide-btn">
+        <span class="btn-icon">📖</span>
+        <span>游戏指南</span>
+    </a>
     
     <!-- 游戏指南模态框 -->
-    <div id="guide-modal">
-        <!-- 内容保持不变 -->
+    <div id="guide-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>📚 游戏指南</h2>
+            <div class="guide-section">
+                <ol>
+                    <li>点击绿旗开始游戏</li>
+                    <li>在输入填空题的答案后，请点击屏幕上出现的"确认提交"按键提交</li>
+                    <li>初次加载使用时，答案解析加载视频可能缓慢，请同学们耐心等待，谢谢谅解</li>
+                </ol>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 针对Scratch创世界的优化代码
+        // 精简版指南功能实现
         document.addEventListener('DOMContentLoaded', function() {
-            // 游戏指南功能
             const guideBtn = document.getElementById('guide-btn');
             const guideModal = document.getElementById('guide-modal');
             const closeBtn = document.querySelector('.close-modal');
             
-            function toggleGuide() {
-                guideModal.style.display = guideModal.style.display === 'block' ? 'none' : 'block';
-                document.body.style.overflow = guideModal.style.display === 'block' ? 'hidden' : 'auto';
+            // 显示指南
+            function showGuide(e) {
+                e.preventDefault();
+                guideModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
             }
             
-            guideBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleGuide();
-            });
+            // 隐藏指南
+            function hideGuide() {
+                guideModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
             
-            closeBtn.addEventListener('click', toggleGuide);
+            // 事件监听
+            guideBtn.addEventListener('click', showGuide);
+            closeBtn.addEventListener('click', hideGuide);
             
-            // 全屏功能处理
-            const gameContainer = document.getElementById('game-container');
-            
-            window.addEventListener('message', function(e) {
-                // 确保消息来自我们的iframe
-                if (e.source !== document.getElementById('game-iframe').contentWindow) return;
-                
-                if (e.data === 'ScratchEmbedSetFullScreen') {
-                    document.body.classList.add('fullscreen');
-                } else if (e.data === 'ScratchEmbedSetExitFullScreen') {
-                    document.body.classList.remove('fullscreen');
+            // 点击模态框外部关闭
+            guideModal.addEventListener('click', function(e) {
+                if (e.target === guideModal) {
+                    hideGuide();
                 }
             });
-            
-            // 处理Scratch资源加载错误
-            window.addEventListener('error', function(e) {
-                if (e.target.tagName === 'IMG' || e.target.tagName === 'SCRIPT') {
-                    console.warn('资源加载失败:', e.target.src);
-                    // 这里可以添加备用资源加载逻辑
-                }
-            }, true);
         });
     </script>
 </body>
