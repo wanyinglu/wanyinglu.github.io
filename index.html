@@ -639,14 +639,10 @@
                 observer.observe(el);
             });
 
-            // 游戏指南按钮点击
-            const guideBtn = document.getElementById('guide-btn');
-            const guideModal = document.getElementById('guide-modal');
-            const closeButtons = document.querySelectorAll('.close-modal');
-
-            guideBtn.addEventListener('click', function(e) {
+            // 游戏指南按钮点击（修复后的代码）
+            document.getElementById('guide-btn').addEventListener('click', function(e) {
                 e.preventDefault();
-                guideModal.style.display = 'flex';
+                document.getElementById('guide-modal').style.display = 'flex';
                 // 粒子特效变化 - 增强显示
                 particlesJS('particles-js', {
                     particles: {
@@ -674,17 +670,15 @@
                 });
             }
 
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    guideModal.style.display = 'none';
-                    restoreParticles();
-                });
+            document.querySelector('.close-modal').addEventListener('click', function() {
+                document.getElementById('guide-modal').style.display = 'none';
+                restoreParticles();
             });
 
             // 点击模态框外部关闭
             window.addEventListener('click', function(e) {
-                if (e.target === guideModal) {
-                    guideModal.style.display = 'none';
+                if (e.target === document.getElementById('guide-modal')) {
+                    document.getElementById('guide-modal').style.display = 'none';
                     restoreParticles();
                 }
             });
@@ -712,14 +706,16 @@
                 });
             });
 
-            // 选项卡切换功能
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
+            // 选项卡切换功能（修复后的代码）
+            document.querySelector('.tabs').addEventListener('click', function(e) {
+                if (e.target.classList.contains('tab-btn')) {
                     // 移除所有按钮的active类
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
                     // 给当前点击的按钮添加active类
-                    button.classList.add('active');
+                    e.target.classList.add('active');
                     
                     // 隐藏所有游戏标签
                     document.querySelectorAll('.game-tab').forEach(tab => {
@@ -727,13 +723,13 @@
                     });
                     
                     // 显示对应的游戏标签
-                    const tabId = button.getAttribute('data-tab') + '-tab';
+                    const tabId = e.target.getAttribute('data-tab') + '-tab';
                     document.getElementById(tabId).classList.add('active');
-                });
+                }
             });
 
-            // 控制台彩蛋
-            console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
+            // 控制台彩蛋（修复后的代码）
+            console.log("%c🚀 欢迎来到「角角向前冲」大闯关！", "font-size:20px;color:#6c5ce7;");
         });
     </script>
 </body>
