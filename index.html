@@ -351,27 +351,33 @@
             }
         }
 
-        /* 全屏模式样式 */
-        .body-on-full-screen {
-            overflow: hidden;
-        }
-        .wrapper-on-full-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            background: white;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-        }
-        .iframe-on-full-screen {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 0;
-        }
+       /* 优化全屏样式 */
+.wrapper-on-full-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;  /* 覆盖原有宽度 */
+  height: 100vh !important; /* 覆盖原有高度 */
+  z-index: 9999;            /* 提高层级 */
+  background: white;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.iframe-on-full-screen {
+  width: 95vw !important;
+  height: 95vh !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2) !important;
+}
+
+.body-on-full-screen {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
 
         /* 选项卡样式 */
         .tabs {
@@ -445,7 +451,7 @@
     <div class="game-info">
         <div class="info-card animate delay-2">
             <h3><span class="icon">🌟</span>游戏特色</h3>
-            <p>简单易上手的操作方式，简单易上手的操作方式，丰富多样的关卡设计</p>
+            <p>简单易上手的操作方式，丰富多样的关卡设计</p>
         </div>
         <div class="info-card animate delay-3">
             <h3><span class="icon">🎯</span>游戏理念</h3>
@@ -507,37 +513,73 @@
     </footer>
 
     <script>
-        // 全屏功能处理
-        const hideScrollWhenFullScreen = true;
-        window.addEventListener("message", (event) => {
-            let iframe, wrapper;
-            if (document.querySelector("#game1-tab").classList.contains("active")) {
-                iframe = document.querySelector("#shower1");
-            } else {
-                iframe = document.querySelector("#shower2");
-            }
-            wrapper = document.querySelector("#play");
-            
-            if (event.data === "ScratchEmbedSetFullScreen") {
-                if (wrapper && iframe) {
-                    if (hideScrollWhenFullScreen) {
-                        document.body.classList.add("body-on-full-screen");
-                    }
-                    wrapper.classList.add("wrapper-on-full-screen");
-                    wrapper.classList.remove("game-container");
-                    iframe.classList.add("iframe-on-full-screen");
-                }
-            } else if (event.data === "ScratchEmbedSetExitFullScreen") {
-                if (wrapper && iframe) {
-                    if (hideScrollWhenFullScreen) {
-                        document.body.classList.remove("body-on-full-screen");
-                    }
-                    wrapper.classList.remove("wrapper-on-full-screen");
-                    wrapper.classList.add("game-container");
-                    iframe.classList.remove("iframe-on-full-screen");
-                }
-            }
-        });
+      // 全屏功能处理（优化版）
+const fullScreenHandler = {
+  currentIframe: null,
+  wrapper: document.querySelector("#play"),
+  
+  enterFullScreen(iframe) {
+    if (this.wrapper && iframe) {
+      // 先退出可能存在的旧全屏状态
+      this.exitFullScreen();
+      
+      // 更新当前iframe引用
+      this.currentIframe = iframe;
+      
+      // 应用全屏样式
+      if (hideScrollWhenFullScreen) {
+        document.body.classList.add("body-on-full-screen");
+      }
+      this.wrapper.classList.add("wrapper-on-full-screen");
+      iframe.classList.add("iframe-on-full-screen");
+      
+      // 添加窗口resize监听
+      window.addEventListener('resize', this.handleResize);
+    }
+  },
+  
+  exitFullScreen() {
+    if (this.currentIframe) {
+      document.body.classList.remove("body-on-full-screen");
+      this.wrapper.classList.remove("wrapper-on-full-screen");
+      this.currentIframe.classList.remove("iframe-on-full-screen");
+      window.removeEventListener('resize', this.handleResize);
+      this.currentIframe = null;
+    }
+  },
+  
+  handleResize() {
+    // 修复移动端键盘弹出导致的布局问题
+    if (fullScreenHandler.currentIframe) {
+      fullScreenHandler.currentIframe.style.height = `${window.innerHeight}px`;
+    }
+  }
+};
+
+window.addEventListener("message", (event) => {
+  // 实时获取当前激活的iframe
+  const activeTab = document.querySelector('.game-tab.active');
+  const currentIframe = activeTab?.querySelector('iframe');
+  
+  if (!currentIframe) return;
+
+  switch(event.data) {
+    case "ScratchEmbedSetFullScreen":
+      fullScreenHandler.enterFullScreen(currentIframe);
+      break;
+    case "ScratchEmbedSetExitFullScreen":
+      fullScreenHandler.exitFullScreen();
+      break;
+  }
+});
+
+// 在选项卡切换时增加全屏状态同步
+document.querySelector('.tabs').addEventListener('click', function(e) {
+  if (fullScreenHandler.currentIframe) {
+    // 如果当前处于全屏状态，先退出全屏
+    fullScreenHandler.exitFullScreen();
+  }
+});
 
         // 初始化粒子效果
         document.addEventListener('DOMContentLoaded', function() {
