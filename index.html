@@ -273,7 +273,6 @@
         .delay-2 { animation-delay: 0.4s; }
         .delay-3 { animation-delay: 0.6s; }
         .delay-4 { animation-delay: 0.8s; }
-        .delay-5 { animation-delay: 1.0s; }
 
         /* 游戏指南模态框 */
         .modal {
@@ -373,42 +372,6 @@
             max-height: 100%;
             border-radius: 0;
         }
-
-        /* 游戏选择按钮 */
-        .game-selector {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-            gap: 15px;
-        }
-
-        .game-tab {
-            padding: 10px 20px;
-            border-radius: 30px;
-            background: var(--primary-light);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .game-tab.active {
-            background: var(--primary-color);
-            font-weight: bold;
-        }
-
-        .game-tab:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-        }
-
-        /* 游戏容器切换 */
-        .game-wrapper {
-            display: none;
-        }
-
-        .game-wrapper.active {
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -452,40 +415,17 @@
         </div>
     </div>
 
-    <!-- 游戏选择器 -->
-    <div class="game-selector animate delay-4">
-        <div class="game-tab active" data-game="game1">游戏一</div>
-        <div class="game-tab" data-game="game2">游戏二</div>
-    </div>
-
     <!-- 游戏容器 -->
-    <div id="play" class="game-wrapper active animate delay-4">
-        <div class="game-container">
-            <iframe id="shower1"
-                src="https://www.scratch-cw.top/projects/4347/embed"
-                allowtransparency="true"
-                width="485"
-                height="402"
-                frameborder="0"
-                scrolling="no"
-                allowfullscreen>
-            </iframe>
-        </div>
-    </div>
-
-    <!-- 第二个游戏容器 -->
-    <div id="play" class="game-wrapper animate delay-4">
-        <div class="game-container">
-            <iframe id="shower2"
-                src="https://www.scratch-cw.top/projects/4745/embed"
-                allowtransparency="true"
-                width="485"
-                height="402"
-                frameborder="0"
-                scrolling="no"
-                allowfullscreen>
-            </iframe>
-        </div>
+    <div id="play" class="game-container animate delay-4">
+        <iframe id="shower"
+            src="https://www.scratch-cw.top/projects/4347/embed"
+            allowtransparency="true"
+            width="485"
+            height="402"
+            frameborder="0"
+            scrolling="no"
+            allowfullscreen>
+        </iframe>
     </div>
 
     <!-- 游戏指南模态框 -->
@@ -504,42 +444,37 @@
     </div>
 
     <!-- 页脚 -->
-    <footer class="animate delay-5">
+    <footer class="animate delay-4">
         <p class="copyright">游戏制作：wanyinglu</p>
-        <p>© 2025 《"角角向前冲"大闯关》版权所有 | 禁止商用或二次创作</p>
+        <p>© 2025 《“角角向前冲”大闯关》版权所有 | 禁止商用或二次创作</p>
     </footer>
 
     <script>
         // 全屏功能处理
         const hideScrollWhenFullScreen = true;
-        
-        // 处理多个iframe的全屏功能
-        function setupFullScreenListener(iframeId, wrapperSelector) {
-            const iframe = document.querySelector(iframeId);
-            const wrapper = document.querySelector(wrapperSelector + " .game-container");
-            
-            window.addEventListener("message", (event) => {
-                if (event.data === "ScratchEmbedSetFullScreen") {
-                    if (wrapper && iframe && event.source === iframe.contentWindow) {
-                        if (hideScrollWhenFullScreen) {
-                            document.body.classList.add("body-on-full-screen");
-                        }
-                        wrapper.classList.add("wrapper-on-full-screen");
-                        wrapper.classList.remove("game-container");
-                        iframe.classList.add("iframe-on-full-screen");
+        window.addEventListener("message", (event) => {
+            const iframe = document.querySelector("#shower");
+            const wrapper = document.querySelector("#play");
+            if (event.data === "ScratchEmbedSetFullScreen") {
+                if (wrapper && iframe) {
+                    if (hideScrollWhenFullScreen) {
+                        document.body.classList.add("body-on-full-screen");
                     }
-                } else if (event.data === "ScratchEmbedSetExitFullScreen") {
-                    if (wrapper && iframe && event.source === iframe.contentWindow) {
-                        if (hideScrollWhenFullScreen) {
-                            document.body.classList.remove("body-on-full-screen");
-                        }
-                        wrapper.classList.remove("wrapper-on-full-screen");
-                        wrapper.classList.add("game-container");
-                        iframe.classList.remove("iframe-on-full-screen");
-                    }
+                    wrapper.classList.add("wrapper-on-full-screen");
+                    wrapper.classList.remove("game-container");
+                    iframe.classList.add("iframe-on-full-screen");
                 }
-            });
-        }
+            } else if (event.data === "ScratchEmbedSetExitFullScreen") {
+                if (wrapper && iframe) {
+                    if (hideScrollWhenFullScreen) {
+                        document.body.classList.remove("body-on-full-screen");
+                    }
+                    wrapper.classList.remove("wrapper-on-full-screen");
+                    wrapper.classList.add("game-container");
+                    iframe.classList.remove("iframe-on-full-screen");
+                }
+            }
+        });
 
         // 初始化粒子效果
         document.addEventListener('DOMContentLoaded', function() {
@@ -621,10 +556,6 @@
                 },
                 "retina_detect": true
             });
-
-            // 设置全屏监听器
-            setupFullScreenListener("#shower1", ".game-wrapper:nth-child(1)");
-            setupFullScreenListener("#shower2", ".game-wrapper:nth-child(2)");
 
             // 滚动动画触发
             const animateElements = document.querySelectorAll('.animate');
@@ -713,36 +644,13 @@
                 });
 
                 // 滚动到游戏位置
-                document.querySelector('.game-wrapper.active').scrollIntoView({
+                document.querySelector('#play').scrollIntoView({
                     behavior: 'smooth'
                 });
             });
 
-            // 游戏切换功能
-            const gameTabs = document.querySelectorAll('.game-tab');
-            const gameWrappers = document.querySelectorAll('.game-wrapper');
-
-            gameTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // 更新标签状态
-                    gameTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // 更新游戏显示状态
-                    const gameId = this.getAttribute('data-game');
-                    gameWrappers.forEach(wrapper => {
-                        wrapper.classList.remove('active');
-                        if (wrapper.id === gameId || 
-                            (gameId === 'game1' && wrapper === gameWrappers[0]) || 
-                            (gameId === 'game2' && wrapper === gameWrappers[1])) {
-                            wrapper.classList.add('active');
-                        }
-                    });
-                });
-            });
-
             // 控制台彩蛋
-            console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
+            console.log("%c🚀 欢迎来到“角角向前冲”大闯关！", "font-size:20px;color:#6c5ce7;");
         });
     </script>
 </body>
