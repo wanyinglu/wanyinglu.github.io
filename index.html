@@ -372,6 +372,44 @@
             max-height: 100%;
             border-radius: 0;
         }
+
+        /* 选项卡样式 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4);
+        }
+
+        .game-tab {
+            display: none;
+            width: 100%;
+        }
+
+        .game-tab.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -389,7 +427,7 @@
     <!-- 主标题区 -->
     <section class="hero animate delay-1">
         <h1>开启你的<span class="highlight">冒险之旅</span></h1>
-        <p class="subtitle">《“角角向前冲”大闯关》是一款用Scratch创世界制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
+        <p class="subtitle">《"角角向前冲"大闯关》是一款用Scratch创世界制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
 
         <div class="action-buttons">
             <a href="#play" class="btn btn-primary" id="play-btn">
@@ -407,7 +445,7 @@
     <div class="game-info">
         <div class="info-card animate delay-2">
             <h3><span class="icon">🌟</span>游戏特色</h3>
-            <p>简单易上手的操作方式，丰富多样的关卡设计</p>
+            <p>简单易上手的操作方式，简单易上手的操作方式，丰富多样的关卡设计</p>
         </div>
         <div class="info-card animate delay-3">
             <h3><span class="icon">🎯</span>游戏理念</h3>
@@ -415,17 +453,36 @@
         </div>
     </div>
 
+    <!-- 游戏选项卡 -->
+    <div class="tabs animate delay-4">
+        <button class="tab-btn active" data-tab="game1">游戏一</button>
+        <button class="tab-btn" data-tab="game2">游戏二</button>
+    </div>
+
     <!-- 游戏容器 -->
     <div id="play" class="game-container animate delay-4">
-        <iframe id="shower"
-            src="https://www.scratch-cw.top/projects/4347/embed"
-            allowtransparency="true"
-            width="485"
-            height="402"
-            frameborder="0"
-            scrolling="no"
-            allowfullscreen>
-        </iframe>
+        <div class="game-tab active" id="game1-tab">
+            <iframe id="shower1"
+                src="https://www.scratch-cw.top/projects/4764/embed"
+                allowtransparency="true"
+                width="485"
+                height="402"
+                frameborder="0"
+                scrolling="no"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="game-tab" id="game2-tab">
+            <iframe id="shower2"
+                src="https://www.scratch-cw.top/projects/4347/embed"
+                allowtransparency="true"
+                width="485"
+                height="402"
+                frameborder="0"
+                scrolling="no"
+                allowfullscreen>
+            </iframe>
+        </div>
     </div>
 
     <!-- 游戏指南模态框 -->
@@ -446,15 +503,21 @@
     <!-- 页脚 -->
     <footer class="animate delay-4">
         <p class="copyright">游戏制作：wanyinglu</p>
-        <p>© 2025 《“角角向前冲”大闯关》版权所有 | 禁止商用或二次创作</p>
+        <p>© 2025 《"角角向前冲"大闯关》版权所有 | 禁止商用或二次创作</p>
     </footer>
 
     <script>
         // 全屏功能处理
         const hideScrollWhenFullScreen = true;
         window.addEventListener("message", (event) => {
-            const iframe = document.querySelector("#shower");
-            const wrapper = document.querySelector("#play");
+            let iframe, wrapper;
+            if (document.querySelector("#game1-tab").classList.contains("active")) {
+                iframe = document.querySelector("#shower1");
+            } else {
+                iframe = document.querySelector("#shower2");
+            }
+            wrapper = document.querySelector("#play");
+            
             if (event.data === "ScratchEmbedSetFullScreen") {
                 if (wrapper && iframe) {
                     if (hideScrollWhenFullScreen) {
@@ -649,8 +712,28 @@
                 });
             });
 
+            // 选项卡切换功能
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有按钮的active类
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    // 给当前点击的按钮添加active类
+                    button.classList.add('active');
+                    
+                    // 隐藏所有游戏标签
+                    document.querySelectorAll('.game-tab').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    
+                    // 显示对应的游戏标签
+                    const tabId = button.getAttribute('data-tab') + '-tab';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
             // 控制台彩蛋
-            console.log("%c🚀 欢迎来到“角角向前冲”大闯关！", "font-size:20px;color:#6c5ce7;");
+            console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
         });
     </script>
 </body>
