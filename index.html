@@ -352,35 +352,47 @@
         }
 
         /* 全屏模式样式 */
-        .body-on-full-screen {
-            overflow: hidden;
-        }
-        
-        /* 修正全屏样式 */
-        #fullscreen-container {
+        .fullscreen-mode {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
+            z-index: 9999 !important;
             background: white;
-            z-index: 1500;
-            display: flex !important;
-            justify-content: center;
-            align-items: center;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            overflow: hidden !important;
         }
 
-        .iframe-on-full-screen {
+        .fullscreen-mode iframe {
             width: 100% !important;
             height: 100% !important;
-            max-width: 100% !important;
-            max-height: 100vh !important;
             border: none !important;
             border-radius: 0 !important;
         }
 
-        .body-on-full-screen {
-            overflow: hidden !important;
+        .fullscreen-close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: #666;
+            cursor: pointer;
+            z-index: 10000;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .no-scroll {
+            overflow: hidden;
+            height: 100%;
         }
 
         /* 选项卡样式 */
@@ -437,7 +449,7 @@
     <!-- 主标题区 -->
     <section class="hero animate delay-1">
         <h1>开启你的<span class="highlight">冒险之旅</span></h1>
-        <p class="subtitle">《"角角向前冲"大闯关》是一系列用Scratch创世界制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
+        <p class="subtitle">《"角角向前冲"大闯关》是一款用Scratch创世界制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
 
         <div class="action-buttons">
             <a href="#play" class="btn btn-primary" id="play-btn">
@@ -455,11 +467,11 @@
     <div class="game-info">
         <div class="info-card animate delay-2">
             <h3><span class="icon">🌟</span>游戏特色</h3>
-            <p>简单易上手的操作方式，丰富多样的关卡设计</p>
+            <p>简单易上手的操作方式，简单易上手的操作方式，丰富多样的关卡设计</p>
         </div>
         <div class="info-card animate delay-3">
             <h3><span class="icon">🎯</span>游戏理念</h3>
-            <p>让玩家通过游戏巩固课堂所学到的知识</p>
+            <p>答对进入下一题，答错可观看答案解析，完成一关结算一关，可重复挑战</p>
         </div>
     </div>
 
@@ -501,16 +513,10 @@
             <span class="close-modal">&times;</span>
             <h2>📚 游戏指南</h2>
             <div class="guide-section">
-                <h3>游戏一操作说明</h3>
+                <h3>游戏操作说明</h3>
                 <ol>
                     <li>点击绿旗开始游戏</li>
                     <li>在输入填空题的答案后，请点击屏幕上出现的"确认提交"按键提交</li>
-                </ol>
-                <h3>游戏二操作说明</h3>
-                <ol>
-                    <li>点击绿旗开始游戏</li>
-                    <li>按照从大到小、从左到右的顺序对角角们进行排序</li>
-                     <li>点击角角和对应的台子，即可完成排序</li>
                 </ol>
             </div>
         </div>
@@ -524,71 +530,79 @@
 
     <script>
         // 全屏功能处理
-        const hideScrollWhenFullScreen = true;
-        let currentGameIframe = document.querySelector("#shower1"); // 默认第一个游戏
-        let wrapper = document.querySelector("#play");
+        let isFullscreen = false;
+        let originalParent = null;
+        let originalStyles = null;
+        let closeBtn = null;
+        let clonedIframe = null;
 
-        // 更新当前活动的iframe
-        function updateActiveIframe() {
-            currentGameIframe = document.querySelector(".game-tab.active iframe");
-        }
-
-        window.addEventListener("message", (event) => {
-            updateActiveIframe(); // 每次消息都更新当前iframe
-            
+        function handleFullscreenMessage(event) {
             if (event.data === "ScratchEmbedSetFullScreen") {
-                if (wrapper && currentGameIframe) {
-                    if (hideScrollWhenFullScreen) {
-                        document.body.classList.add("body-on-full-screen");
-                    }
-                    // 添加全屏容器
-                    const fullscreenContainer = document.createElement('div');
-                    fullscreenContainer.id = 'fullscreen-container';
-                    document.body.appendChild(fullscreenContainer);
-                    
-                    // 移动iframe到全屏容器
-                    fullscreenContainer.appendChild(currentGameIframe);
-                    currentGameIframe.classList.add("iframe-on-full-screen");
-                    
-                    // 添加关闭按钮
-                    const closeBtn = document.createElement('div');
-                    closeBtn.innerHTML = '×';
-                    closeBtn.style.cssText = `
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        font-size: 30px;
-                        color: #666;
-                        cursor: pointer;
-                        z-index: 2000;
-                    `;
-                    closeBtn.onclick = exitFullScreen;
-                    document.body.appendChild(closeBtn);
-                }
+                enterFullscreen();
             } else if (event.data === "ScratchEmbedSetExitFullScreen") {
-                exitFullScreen();
+                exitFullscreen();
             }
-        });
-
-        function exitFullScreen() {
-            if (hideScrollWhenFullScreen) {
-                document.body.classList.remove("body-on-full-screen");
-            }
-            
-            // 恢复iframe到原位置
-            const gameTab = document.querySelector(".game-tab.active");
-            if (gameTab && currentGameIframe) {
-                gameTab.appendChild(currentGameIframe);
-                currentGameIframe.classList.remove("iframe-on-full-screen");
-            }
-            
-            // 清理全屏元素
-            const container = document.getElementById('fullscreen-container');
-            if (container) container.remove();
-            document.querySelectorAll('div').forEach(el => {
-                if (el.innerHTML === '×') el.remove();
-            });
         }
+
+        function enterFullscreen() {
+            if (isFullscreen) return;
+            
+            const activeIframe = document.querySelector('.game-tab.active iframe');
+            if (!activeIframe) return;
+
+            // 保存原始状态
+            originalParent = activeIframe.parentNode;
+            originalStyles = {
+                width: activeIframe.style.width,
+                height: activeIframe.style.height,
+                position: activeIframe.style.position,
+                top: activeIframe.style.top,
+                left: activeIframe.style.left
+            };
+
+            // 创建全屏容器
+            const container = document.createElement('div');
+            container.className = 'fullscreen-mode';
+            
+            // 克隆iframe避免重新加载
+            clonedIframe = activeIframe.cloneNode(true);
+            clonedIframe.id = 'fullscreen-iframe'; // 防止ID冲突
+            
+            container.appendChild(clonedIframe);
+            document.body.appendChild(container);
+
+            // 添加关闭按钮
+            closeBtn = document.createElement('div');
+            closeBtn.className = 'fullscreen-close-btn';
+            closeBtn.innerHTML = '×';
+            closeBtn.onclick = exitFullscreen;
+            document.body.appendChild(closeBtn);
+
+            // 隐藏原iframe
+            activeIframe.style.display = 'none';
+            
+            isFullscreen = true;
+            document.documentElement.classList.add('no-scroll');
+        }
+
+        function exitFullscreen() {
+            if (!isFullscreen) return;
+
+            // 恢复原iframe
+            const originalIframe = document.querySelector('.game-tab.active iframe');
+            originalIframe.style.display = '';
+            
+            // 移除全屏元素
+            const container = document.querySelector('.fullscreen-mode');
+            if (container) container.remove();
+            if (closeBtn) closeBtn.remove();
+            
+            isFullscreen = false;
+            document.documentElement.classList.remove('no-scroll');
+        }
+
+        // 更新事件监听
+        window.addEventListener("message", handleFullscreenMessage);
 
         // 初始化粒子效果
         document.addEventListener('DOMContentLoaded', function() {
@@ -690,7 +704,7 @@
                 observer.observe(el);
             });
 
-            // 游戏指南按钮点击（修复后的代码）
+            // 游戏指南按钮点击
             document.getElementById('guide-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 document.getElementById('guide-modal').style.display = 'flex';
@@ -757,7 +771,7 @@
                 });
             });
 
-            // 选项卡切换功能（修复后的代码）
+            // 选项卡切换功能
             document.querySelector('.tabs').addEventListener('click', function(e) {
                 if (e.target.classList.contains('tab-btn')) {
                     // 移除所有按钮的active类
@@ -776,13 +790,10 @@
                     // 显示对应的游戏标签
                     const tabId = e.target.getAttribute('data-tab') + '-tab';
                     document.getElementById(tabId).classList.add('active');
-                    
-                    // 更新当前活动的iframe
-                    updateActiveIframe();
                 }
             });
 
-            // 控制台彩蛋（修复后的代码）
+            // 控制台彩蛋
             console.log("%c🚀 欢迎来到「角角向前冲」大闯关！", "font-size:20px;color:#6c5ce7;");
         });
     </script>
