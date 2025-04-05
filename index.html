@@ -180,9 +180,7 @@
         }
         
         /* 全屏模式下的样式 */
-        :fullscreen .game-container,
-        :-webkit-full-screen .game-container,
-        :-moz-full-screen .game-container {
+        .game-container:fullscreen {
             width: 100% !important;
             height: 100% !important;
             max-width: none !important;
@@ -195,9 +193,7 @@
             background: white !important;
         }
         
-        :fullscreen .game-container .game-iframe.active,
-        :-webkit-full-screen .game-container .game-iframe.active,
-        :-moz-full-screen .game-container .game-iframe.active {
+        .game-container:fullscreen .game-iframe.active {
             width: 100% !important;
             height: 100% !important;
             max-width: 100% !important;
@@ -480,10 +476,10 @@
                 <span class="btn-icon">▶</span>
                 <span>开始游戏</span>
             </a>
-            <a href="#guide" class="btn btn-outline" id="guide-btn">
+            <button class="btn btn-outline" id="guide-btn">
                 <span class="btn-icon">📖</span>
                 <span>游戏指南</span>
-            </a>
+            </button>
         </div>
     </section>
     
@@ -656,10 +652,9 @@
             // 游戏指南按钮点击
             const guideBtn = document.getElementById('guide-btn');
             const guideModal = document.getElementById('guide-modal');
-            const closeButtons = document.querySelectorAll('.close-modal');
+            const closeModal = document.querySelector('.close-modal');
             
-            guideBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            guideBtn.addEventListener('click', function() {
                 guideModal.style.display = 'flex';
                 // 粒子特效变化 - 增强显示
                 particlesJS('particles-js', {
@@ -688,11 +683,9 @@
                 });
             }
             
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    guideModal.style.display = 'none';
-                    restoreParticles();
-                });
+            closeModal.addEventListener('click', function() {
+                guideModal.style.display = 'none';
+                restoreParticles();
             });
             
             // 点击模态框外部关闭
