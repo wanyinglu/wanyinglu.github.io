@@ -18,13 +18,13 @@
             --gray-color: #636e72;
             --success-color: #00b894;
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
         body {
             font-family: 'Poppins', 'Noto Sans SC', sans-serif;
             max-width: 1200px;
@@ -38,7 +38,7 @@
             flex-direction: column;
             align-items: center;
         }
-        
+
         /* 粒子画布容器 */
         #particles-js {
             position: fixed;
@@ -49,7 +49,7 @@
             z-index: -1;
             background: linear-gradient(135deg, #f9f9ff 0%, #e6e9ff 100%);
         }
-        
+
         /* 导航栏 */
         .navbar {
             width: 100%;
@@ -59,7 +59,7 @@
             padding: 15px 0;
             margin-bottom: 30px;
         }
-        
+
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
@@ -68,12 +68,12 @@
             display: flex;
             align-items: center;
         }
-        
+
         .logo-icon {
             margin-right: 10px;
             font-size: 1.8rem;
         }
-        
+
         /* 主标题 */
         .hero {
             margin: 30px 0 40px;
@@ -83,7 +83,7 @@
             border-radius: 10px;
             padding: 20px;
         }
-        
+
         h1 {
             color: var(--primary-dark);
             font-size: 3rem;
@@ -92,12 +92,12 @@
             position: relative;
             display: inline-block;
         }
-        
+
         h1 .highlight {
             color: var(--accent-color);
             position: relative;
         }
-        
+
         h1 .highlight::after {
             content: "";
             position: absolute;
@@ -109,14 +109,14 @@
             z-index: -1;
             border-radius: 5px;
         }
-        
+
         .subtitle {
             font-size: 1.2rem;
             color: var(--gray-color);
             margin-bottom: 30px;
             line-height: 1.6;
         }
-        
+
         /* 游戏容器 */
         .game-container {
             margin: 30px auto;
@@ -129,80 +129,19 @@
             padding: 20px;
             border: 1px solid rgba(255,255,255,0.3);
             width: fit-content;
-            position: relative;
         }
-        
+
         .game-container:hover {
             transform: translateY(-8px) scale(1.01);
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
         }
-        
-        .game-iframe {
+
+        iframe {
             border-radius: 10px;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
             border: 1px solid rgba(0,0,0,0.05);
-            display: none;
-            width: 485px;
-            height: 402px;
         }
-        
-        .game-iframe.active {
-            display: block;
-        }
-        
-        /* 全屏按钮样式 */
-        .fullscreen-btn {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            background: rgba(108, 92, 231, 0.8);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-        
-        .fullscreen-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-        
-        .fullscreen-btn .icon {
-            font-size: 1.1rem;
-        }
-        
-        /* 全屏模式下的样式 */
-        .game-container:fullscreen {
-            width: 100% !important;
-            height: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            background: white !important;
-        }
-        
-        .game-container:fullscreen .game-iframe.active {
-            width: 100% !important;
-            height: 100% !important;
-            max-width: 100% !important;
-            max-height: 100% !important;
-            border-radius: 0 !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        
+
         /* 游戏信息卡片 */
         .game-info {
             display: flex;
@@ -213,7 +152,7 @@
             flex-wrap: wrap;
             gap: 20px;
         }
-        
+
         .info-card {
             background: rgba(255,255,255,0.92);
             backdrop-filter: blur(8px);
@@ -225,12 +164,12 @@
             border: 1px solid rgba(255,255,255,0.3);
             transition: all 0.3s ease;
         }
-        
+
         .info-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.12);
         }
-        
+
         .info-card h3 {
             color: var(--primary-dark);
             margin-bottom: 15px;
@@ -239,17 +178,17 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .info-card h3 .icon {
             margin-right: 10px;
             color: var(--accent-color);
         }
-        
+
         .info-card p {
             color: var(--gray-color);
             line-height: 1.6;
         }
-        
+
         /* 操作按钮 */
         .action-buttons {
             display: flex;
@@ -258,7 +197,7 @@
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         .btn {
             padding: 12px 25px;
             border-radius: 50px;
@@ -272,34 +211,34 @@
             border: none;
             font-size: 1rem;
         }
-        
+
         .btn-primary {
             background: var(--primary-color);
             color: white;
             box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
         }
-        
+
         .btn-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6);
         }
-        
+
         .btn-outline {
             background: transparent;
             color: var(--primary-color);
             border: 2px solid var(--primary-light);
         }
-        
+
         .btn-outline:hover {
             background: rgba(162, 155, 254, 0.1);
             transform: translateY(-3px);
         }
-        
+
         .btn-icon {
             margin-right: 8px;
         }
-        
+
         /* 页脚 */
         footer {
             width: 100%;
@@ -315,27 +254,27 @@
             backdrop-filter: blur(2px);
             border-radius: 10px;
         }
-        
+
         .copyright {
             margin-top: 10px;
         }
-        
+
         /* 动画效果 */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .animate {
             animation: fadeInUp 0.8s ease-out forwards;
         }
-        
+
         .delay-1 { animation-delay: 0.2s; }
         .delay-2 { animation-delay: 0.4s; }
         .delay-3 { animation-delay: 0.6s; }
         .delay-4 { animation-delay: 0.8s; }
         .delay-5 { animation-delay: 1.0s; }
-        
+
         /* 游戏指南模态框 */
         .modal {
             display: none;
@@ -350,7 +289,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .modal-content {
             background: white;
             padding: 30px;
@@ -362,12 +301,12 @@
             position: relative;
             animation: modalFadeIn 0.3s ease-out;
         }
-        
+
         @keyframes modalFadeIn {
             from { opacity: 0; transform: translateY(-50px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .close-modal {
             position: absolute;
             top: 15px;
@@ -377,11 +316,64 @@
             color: var(--gray-color);
             transition: color 0.3s;
         }
-        
+
         .close-modal:hover {
             color: var(--primary-color);
         }
-        
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .game-info {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .info-card {
+                width: 100%;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* 全屏模式样式 */
+        .body-on-full-screen {
+            overflow: hidden;
+        }
+        .wrapper-on-full-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        .iframe-on-full-screen {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 0;
+        }
+
         /* 游戏选择按钮 */
         .game-selector {
             display: flex;
@@ -389,75 +381,40 @@
             margin: 20px 0;
             gap: 15px;
         }
-        
+
         .game-tab {
             padding: 10px 20px;
             border-radius: 30px;
-            background: rgba(108, 92, 231, 0.1);
-            color: var(--primary-dark);
+            background: var(--primary-light);
+            color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: none;
-            font-weight: 600;
         }
-        
+
         .game-tab.active {
             background: var(--primary-color);
-            color: white;
+            font-weight: bold;
+        }
+
+        .game-tab:hover {
+            transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
         }
-        
-        .game-tab:hover:not(.active) {
-            background: rgba(108, 92, 231, 0.2);
+
+        /* 游戏容器切换 */
+        .game-wrapper {
+            display: none;
         }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .game-info {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .info-card {
-                width: 100%;
-            }
-            
-            .navbar {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .game-selector {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .game-iframe {
-                width: 100%;
-                height: auto;
-                min-height: 300px;
-            }
+
+        .game-wrapper.active {
+            display: block;
         }
     </style>
 </head>
 <body>
     <!-- 粒子背景容器 -->
     <div id="particles-js"></div>
-    
+
     <!-- 导航栏 -->
     <nav class="navbar animate">
         <a href="#" class="logo">
@@ -465,24 +422,24 @@
             <span>“角角向前冲”大闯关</span>
         </a>
     </nav>
-    
+
     <!-- 主标题区 -->
     <section class="hero animate delay-1">
         <h1>开启你的<span class="highlight">冒险之旅</span></h1>
-        <p class="subtitle">《"角角向前冲"大闯关》是一款用Scratch创世界制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
-        
+        <p class="subtitle">《“角角向前冲”大闯关》是一款用Scratch创世界制作的趣味闯关游戏，玩家通过答题可以巩固课堂中学到的知识点</p>
+
         <div class="action-buttons">
             <a href="#play" class="btn btn-primary" id="play-btn">
                 <span class="btn-icon">▶</span>
                 <span>开始游戏</span>
             </a>
-            <button class="btn btn-outline" id="guide-btn">
+            <a href="#guide" class="btn btn-outline" id="guide-btn">
                 <span class="btn-icon">📖</span>
                 <span>游戏指南</span>
-            </button>
+            </a>
         </div>
     </section>
-    
+
     <!-- 游戏信息卡片 -->
     <div class="game-info">
         <div class="info-card animate delay-2">
@@ -494,39 +451,43 @@
             <p>答对进入下一题，答错可观看答案解析，完成一关结算一关，可重复挑战</p>
         </div>
     </div>
-    
+
     <!-- 游戏选择器 -->
     <div class="game-selector animate delay-4">
-        <button class="game-tab active" data-game="game1">游戏一</button>
-        <button class="game-tab" data-game="game2">游戏二</button>
+        <div class="game-tab active" data-game="game1">游戏一</div>
+        <div class="game-tab" data-game="game2">游戏二</div>
     </div>
-    
+
     <!-- 游戏容器 -->
-    <div id="play" class="game-container animate delay-5">
-        <!-- 游戏一 -->
-        <iframe id="game1" class="game-iframe active"
-            src="https://www.scratch-cw.top/projects/4347/embed" 
-            allowtransparency="true" 
-            frameborder="0" 
-            scrolling="no" 
-            allowfullscreen>
-        </iframe>
-        
-        <!-- 游戏二 -->
-        <iframe id="game2" class="game-iframe"
-            src="https://www.scratch-cw.top/projects/4745/embed"
-            allowtransparency="true"
-            frameborder="0"
-            scrolling="no"
-            allowfullscreen>
-        </iframe>
-        
-        <button class="fullscreen-btn" id="fullscreen-btn">
-            <span class="icon">⛶</span>
-            <span>全屏</span>
-        </button>
+    <div id="play" class="game-wrapper active animate delay-4">
+        <div class="game-container">
+            <iframe id="shower1"
+                src="https://www.scratch-cw.top/projects/4347/embed"
+                allowtransparency="true"
+                width="485"
+                height="402"
+                frameborder="0"
+                scrolling="no"
+                allowfullscreen>
+            </iframe>
+        </div>
     </div>
-    
+
+    <!-- 第二个游戏容器 -->
+    <div id="play" class="game-wrapper animate delay-4">
+        <div class="game-container">
+            <iframe id="shower2"
+                src="https://www.scratch-cw.top/projects/4745/embed"
+                allowtransparency="true"
+                width="485"
+                height="402"
+                frameborder="0"
+                scrolling="no"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
     <!-- 游戏指南模态框 -->
     <div id="guide-modal" class="modal">
         <div class="modal-content">
@@ -541,14 +502,45 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 页脚 -->
     <footer class="animate delay-5">
         <p class="copyright">游戏制作：wanyinglu</p>
-        <p>© 2025 《角角向前冲》版权所有 | 禁止商用或二次创作</p>
+        <p>© 2025 《"角角向前冲"大闯关》版权所有 | 禁止商用或二次创作</p>
     </footer>
 
     <script>
+        // 全屏功能处理
+        const hideScrollWhenFullScreen = true;
+        
+        // 处理多个iframe的全屏功能
+        function setupFullScreenListener(iframeId, wrapperSelector) {
+            const iframe = document.querySelector(iframeId);
+            const wrapper = document.querySelector(wrapperSelector + " .game-container");
+            
+            window.addEventListener("message", (event) => {
+                if (event.data === "ScratchEmbedSetFullScreen") {
+                    if (wrapper && iframe && event.source === iframe.contentWindow) {
+                        if (hideScrollWhenFullScreen) {
+                            document.body.classList.add("body-on-full-screen");
+                        }
+                        wrapper.classList.add("wrapper-on-full-screen");
+                        wrapper.classList.remove("game-container");
+                        iframe.classList.add("iframe-on-full-screen");
+                    }
+                } else if (event.data === "ScratchEmbedSetExitFullScreen") {
+                    if (wrapper && iframe && event.source === iframe.contentWindow) {
+                        if (hideScrollWhenFullScreen) {
+                            document.body.classList.remove("body-on-full-screen");
+                        }
+                        wrapper.classList.remove("wrapper-on-full-screen");
+                        wrapper.classList.add("game-container");
+                        iframe.classList.remove("iframe-on-full-screen");
+                    }
+                }
+            });
+        }
+
         // 初始化粒子效果
         document.addEventListener('DOMContentLoaded', function() {
             particlesJS('particles-js', {
@@ -629,10 +621,14 @@
                 },
                 "retina_detect": true
             });
-            
+
+            // 设置全屏监听器
+            setupFullScreenListener("#shower1", ".game-wrapper:nth-child(1)");
+            setupFullScreenListener("#shower2", ".game-wrapper:nth-child(2)");
+
             // 滚动动画触发
             const animateElements = document.querySelectorAll('.animate');
-            
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -641,20 +637,21 @@
                     }
                 });
             }, { threshold: 0.1 });
-            
+
             animateElements.forEach(el => {
                 el.style.opacity = 0;
                 el.style.transform = 'translateY(30px)';
                 el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
                 observer.observe(el);
             });
-            
+
             // 游戏指南按钮点击
             const guideBtn = document.getElementById('guide-btn');
             const guideModal = document.getElementById('guide-modal');
-            const closeModal = document.querySelector('.close-modal');
-            
-            guideBtn.addEventListener('click', function() {
+            const closeButtons = document.querySelectorAll('.close-modal');
+
+            guideBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 guideModal.style.display = 'flex';
                 // 粒子特效变化 - 增强显示
                 particlesJS('particles-js', {
@@ -662,7 +659,7 @@
                         color: { value: "#a29bfe" },
                         opacity: { value: 0.6 },
                         size: { value: 4 },
-                        line_linked: { 
+                        line_linked: {
                             enable: true,
                             opacity: 0.2,
                             width: 1
@@ -670,7 +667,7 @@
                     }
                 });
             });
-            
+
             // 关闭按钮点击
             function restoreParticles() {
                 particlesJS('particles-js', {
@@ -682,12 +679,14 @@
                     }
                 });
             }
-            
-            closeModal.addEventListener('click', function() {
-                guideModal.style.display = 'none';
-                restoreParticles();
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    guideModal.style.display = 'none';
+                    restoreParticles();
+                });
             });
-            
+
             // 点击模态框外部关闭
             window.addEventListener('click', function(e) {
                 if (e.target === guideModal) {
@@ -695,7 +694,7 @@
                     restoreParticles();
                 }
             });
-            
+
             // 开始游戏按钮点击效果
             document.getElementById('play-btn').addEventListener('click', function(e) {
                 e.preventDefault();
@@ -712,84 +711,36 @@
                         }
                     }
                 });
-                
+
                 // 滚动到游戏位置
-                document.querySelector('#play').scrollIntoView({ 
-                    behavior: 'smooth' 
+                document.querySelector('.game-wrapper.active').scrollIntoView({
+                    behavior: 'smooth'
                 });
             });
 
             // 游戏切换功能
             const gameTabs = document.querySelectorAll('.game-tab');
-            const gameIframes = document.querySelectorAll('.game-iframe');
-            
+            const gameWrappers = document.querySelectorAll('.game-wrapper');
+
             gameTabs.forEach(tab => {
                 tab.addEventListener('click', function() {
                     // 更新标签状态
                     gameTabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // 更新iframe状态
-                    const gameId = this.dataset.game;
-                    gameIframes.forEach(iframe => {
-                        iframe.classList.remove('active');
-                        if (iframe.id === gameId) {
-                            iframe.classList.add('active');
+                    // 更新游戏显示状态
+                    const gameId = this.getAttribute('data-game');
+                    gameWrappers.forEach(wrapper => {
+                        wrapper.classList.remove('active');
+                        if (wrapper.id === gameId || 
+                            (gameId === 'game1' && wrapper === gameWrappers[0]) || 
+                            (gameId === 'game2' && wrapper === gameWrappers[1])) {
+                            wrapper.classList.add('active');
                         }
                     });
                 });
             });
-            
-            // 全屏功能实现
-            const fullscreenBtn = document.getElementById('fullscreen-btn');
-            const gameContainer = document.querySelector('.game-container');
-            
-            function toggleFullscreen() {
-                if (!document.fullscreenElement) {
-                    // 进入全屏
-                    if (gameContainer.requestFullscreen) {
-                        gameContainer.requestFullscreen().catch(err => {
-                            console.error('全屏错误:', err);
-                        });
-                    } else if (gameContainer.webkitRequestFullscreen) {
-                        gameContainer.webkitRequestFullscreen();
-                    } else if (gameContainer.msRequestFullscreen) {
-                        gameContainer.msRequestFullscreen();
-                    }
-                } else {
-                    // 退出全屏
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    } else if (document.msExitFullscreen) {
-                        document.msExitFullscreen();
-                    }
-                }
-            }
-            
-            // 监听全屏状态变化
-            document.addEventListener('fullscreenchange', updateFullscreen);
-            document.addEventListener('webkitfullscreenchange', updateFullscreen);
-            document.addEventListener('msfullscreenchange', updateFullscreen);
-            
-            function updateFullscreen() {
-                const isFullscreen = document.fullscreenElement || 
-                                    document.webkitFullscreenElement || 
-                                    document.msFullscreenElement;
-                
-                if (isFullscreen) {
-                    // 全屏状态
-                    fullscreenBtn.innerHTML = '<span class="icon">✕</span><span>退出全屏</span>';
-                } else {
-                    // 退出全屏状态
-                    fullscreenBtn.innerHTML = '<span class="icon">⛶</span><span>全屏</span>';
-                }
-            }
-            
-            // 点击全屏按钮
-            fullscreenBtn.addEventListener('click', toggleFullscreen);
-            
+
             // 控制台彩蛋
             console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
         });
