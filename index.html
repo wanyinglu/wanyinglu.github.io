@@ -137,10 +137,16 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
         }
         
-        iframe {
+        .game-iframe {
             border-radius: 10px;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
             border: 1px solid rgba(0,0,0,0.05);
+            display: none;
+            width: 485px;
+            height: 402px;
+        }
+        
+        .game-iframe.active {
             display: block;
         }
         
@@ -174,9 +180,9 @@
         }
         
         /* 全屏模式下的样式 */
-        body:fullscreen .game-container,
-        body:-webkit-full-screen .game-container,
-        body:-moz-full-screen .game-container {
+        :fullscreen .game-container,
+        :-webkit-full-screen .game-container,
+        :-moz-full-screen .game-container {
             width: 100% !important;
             height: 100% !important;
             max-width: none !important;
@@ -189,9 +195,9 @@
             background: white !important;
         }
         
-        body:fullscreen .game-container iframe,
-        body:-webkit-full-screen .game-container iframe,
-        body:-moz-full-screen .game-container iframe {
+        :fullscreen .game-container .game-iframe.active,
+        :-webkit-full-screen .game-container .game-iframe.active,
+        :-moz-full-screen .game-container .game-iframe.active {
             width: 100% !important;
             height: 100% !important;
             max-width: 100% !important;
@@ -443,6 +449,12 @@
                 flex-direction: column;
                 align-items: center;
             }
+            
+            .game-iframe {
+                width: 100%;
+                height: auto;
+                min-height: 300px;
+            }
         }
     </style>
 </head>
@@ -499,8 +511,6 @@
         <iframe id="game1" class="game-iframe active"
             src="https://www.scratch-cw.top/projects/4347/embed" 
             allowtransparency="true" 
-            width="485" 
-            height="402" 
             frameborder="0" 
             scrolling="no" 
             allowfullscreen>
@@ -510,8 +520,6 @@
         <iframe id="game2" class="game-iframe"
             src="https://www.scratch-cw.top/projects/4745/embed"
             allowtransparency="true"
-            width="485"
-            height="402"
             frameborder="0"
             scrolling="no"
             allowfullscreen>
@@ -718,21 +726,33 @@
                 });
             });
 
+            // 游戏切换功能
+            const gameTabs = document.querySelectorAll('.game-tab');
+            const gameIframes = document.querySelectorAll('.game-iframe');
+            
+            gameTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 更新标签状态
+                    gameTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新iframe状态
+                    const gameId = this.dataset.game;
+                    gameIframes.forEach(iframe => {
+                        iframe.classList.remove('active');
+                        if (iframe.id === gameId) {
+                            iframe.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
             // 全屏功能实现
             const fullscreenBtn = document.getElementById('fullscreen-btn');
             const gameContainer = document.querySelector('.game-container');
             
             function toggleFullscreen() {
                 if (!document.fullscreenElement) {
-                    // 进入全屏前保存当前活动游戏iframe
-                    const activeIframe = document.querySelector('.game-iframe.active');
-                    activeIframe.dataset.originalWidth = activeIframe.width;
-                    activeIframe.dataset.originalHeight = activeIframe.height;
-                    
-                    // 移除iframe的固定尺寸属性
-                    activeIframe.removeAttribute('width');
-                    activeIframe.removeAttribute('height');
-                    
                     // 进入全屏
                     if (gameContainer.requestFullscreen) {
                         gameContainer.requestFullscreen().catch(err => {
@@ -768,51 +788,14 @@
                 if (isFullscreen) {
                     // 全屏状态
                     fullscreenBtn.innerHTML = '<span class="icon">✕</span><span>退出全屏</span>';
-                    
-                    // 确保当前活动iframe填满全屏
-                    const activeIframe = document.querySelector('.game-iframe.active');
-                    activeIframe.style.width = '100%';
-                    activeIframe.style.height = '100%';
                 } else {
                     // 退出全屏状态
                     fullscreenBtn.innerHTML = '<span class="icon">⛶</span><span>全屏</span>';
-                    
-                    // 恢复原始尺寸
-                    const activeIframe = document.querySelector('.game-iframe.active');
-                    if (activeIframe.dataset.originalWidth) {
-                        activeIframe.width = activeIframe.dataset.originalWidth;
-                    }
-                    if (activeIframe.dataset.originalHeight) {
-                        activeIframe.height = activeIframe.dataset.originalHeight;
-                    }
-                    activeIframe.style.width = '';
-                    activeIframe.style.height = '';
                 }
             }
             
             // 点击全屏按钮
             fullscreenBtn.addEventListener('click', toggleFullscreen);
-            
-            // 游戏切换功能
-            const gameTabs = document.querySelectorAll('.game-tab');
-            const gameIframes = document.querySelectorAll('.game-iframe');
-            
-            gameTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // 更新标签状态
-                    gameTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // 更新iframe状态
-                    const gameId = this.dataset.game;
-                    gameIframes.forEach(iframe => {
-                        iframe.classList.remove('active');
-                        if (iframe.id === gameId) {
-                            iframe.classList.add('active');
-                        }
-                    });
-                });
-            });
             
             // 控制台彩蛋
             console.log("%c🚀 欢迎来到"角角向前冲"大闯关！", "font-size:20px;color:#6c5ce7;");
