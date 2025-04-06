@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>“角角向前冲”大闯关</title>
+    <title>"角角向前冲"大闯关</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
@@ -39,7 +39,6 @@
             align-items: center;
         }
 
-        /* 粒子画布容器 */
         #particles-js {
             position: fixed;
             width: 100%;
@@ -50,7 +49,6 @@
             background: linear-gradient(135deg, #f9f9ff 0%, #e6e9ff 100%);
         }
 
-        /* 导航栏 */
         .navbar {
             width: 100%;
             display: flex;
@@ -74,7 +72,6 @@
             font-size: 1.8rem;
         }
 
-        /* 主标题 */
         .hero {
             margin: 30px 0 40px;
             max-width: 800px;
@@ -117,7 +114,6 @@
             line-height: 1.6;
         }
 
-        /* 游戏容器 */
         .game-container {
             margin: 30px auto;
             box-shadow: 0 15px 40px rgba(0,0,0,0.12);
@@ -142,7 +138,6 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* 游戏信息卡片 */
         .game-info {
             display: flex;
             justify-content: space-between;
@@ -189,7 +184,6 @@
             line-height: 1.6;
         }
 
-        /* 操作按钮 */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -239,7 +233,6 @@
             margin-right: 8px;
         }
 
-        /* 页脚 */
         footer {
             width: 100%;
             margin-top: 60px;
@@ -259,7 +252,6 @@
             margin-top: 10px;
         }
 
-        /* 动画效果 */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -274,7 +266,6 @@
         .delay-3 { animation-delay: 0.6s; }
         .delay-4 { animation-delay: 0.8s; }
 
-        /* 游戏指南模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -320,7 +311,6 @@
             color: var(--primary-color);
         }
 
-        /* 响应式设计 */
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.2rem;
@@ -352,26 +342,33 @@
         }
 
         /* 全屏模式样式 */
-        #fullscreen-wrapper {
+        .fullscreen-active {
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .fullscreen-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             background: white;
-            z-index: 9999;
+            z-index: 1000;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
-        #fullscreen-wrapper iframe {
+        
+        .fullscreen-iframe {
             width: 100% !important;
             height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100vh !important;
             border: none !important;
             border-radius: 0 !important;
         }
-
+        
         .fullscreen-close-btn {
             position: fixed;
             top: 20px;
@@ -379,7 +376,7 @@
             font-size: 30px;
             color: #666;
             cursor: pointer;
-            z-index: 10000;
+            z-index: 1001;
             background: rgba(255,255,255,0.8);
             border-radius: 50%;
             width: 40px;
@@ -390,7 +387,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* 选项卡样式 */
         .tabs {
             display: flex;
             justify-content: center;
@@ -437,7 +433,7 @@
     <nav class="navbar animate">
         <a href="#" class="logo">
             <span class="logo-icon">🎮</span>
-            <span>“角角向前冲”大闯关</span>
+            <span>"角角向前冲"大闯关</span>
         </a>
     </nav>
 
@@ -526,8 +522,9 @@
     <script>
         // 全屏状态管理
         let isFullscreen = false;
-        let originalContainer = null;
         let activeIframe = null;
+        let originalIframeParent = null;
+        let fullscreenContainer = null;
         let closeBtn = null;
 
         function handleFullscreenMessage(event) {
@@ -541,61 +538,59 @@
         function enterFullscreen() {
             if (isFullscreen) return;
             
-            // 获取当前活动iframe
+            // 获取当前活动的iframe
             activeIframe = document.querySelector('.game-tab.active iframe');
             if (!activeIframe) return;
 
-            // 保存原始容器
-            originalContainer = activeIframe.parentNode;
-
+            // 保存原始父容器
+            originalIframeParent = activeIframe.parentNode;
+            
             // 创建全屏容器
-            const fullscreenWrapper = document.createElement('div');
-            fullscreenWrapper.id = 'fullscreen-wrapper';
+            fullscreenContainer = document.createElement('div');
+            fullscreenContainer.className = 'fullscreen-container';
             
             // 移动iframe到全屏容器（不克隆）
-            fullscreenWrapper.appendChild(activeIframe);
-            document.body.appendChild(fullscreenWrapper);
-
+            fullscreenContainer.appendChild(activeIframe);
+            document.body.appendChild(fullscreenContainer);
+            
+            // 添加全屏样式
+            activeIframe.classList.add('fullscreen-iframe');
+            document.body.classList.add('fullscreen-active');
+            
             // 添加关闭按钮
             closeBtn = document.createElement('div');
             closeBtn.className = 'fullscreen-close-btn';
             closeBtn.innerHTML = '×';
             closeBtn.onclick = exitFullscreen;
             document.body.appendChild(closeBtn);
-
-            // 调整iframe样式
-            activeIframe.style.width = '100%';
-            activeIframe.style.height = '100%';
-            activeIframe.style.border = 'none';
-            activeIframe.style.borderRadius = '0';
-
-            // 隐藏滚动条
-            document.documentElement.style.overflow = 'hidden';
+            
             isFullscreen = true;
         }
 
         function exitFullscreen() {
             if (!isFullscreen) return;
-
-            // 恢复原始容器结构
-            if (originalContainer && activeIframe) {
-                // 恢复iframe原始样式
-                activeIframe.removeAttribute('style');
-                originalContainer.appendChild(activeIframe);
+            
+            // 恢复iframe到原始位置
+            if (originalIframeParent && activeIframe) {
+                activeIframe.classList.remove('fullscreen-iframe');
+                originalIframeParent.appendChild(activeIframe);
             }
-
-            // 移除全屏元素
-            const wrapper = document.getElementById('fullscreen-wrapper');
-            if (wrapper) wrapper.remove();
-            if (closeBtn) closeBtn.remove();
-
+            
+            // 移除全屏容器
+            if (fullscreenContainer) {
+                fullscreenContainer.remove();
+            }
+            
+            // 移除关闭按钮
+            if (closeBtn) {
+                closeBtn.remove();
+            }
+            
             // 恢复滚动
-            document.documentElement.style.overflow = '';
+            document.body.classList.remove('fullscreen-active');
+            
             isFullscreen = false;
         }
-
-        // 更新事件监听
-        window.addEventListener("message", handleFullscreenMessage);
 
         // 初始化粒子效果
         document.addEventListener('DOMContentLoaded', function() {
@@ -790,6 +785,9 @@
                     document.getElementById(tabId).classList.add('active');
                 }
             });
+
+            // 添加全屏事件监听
+            window.addEventListener("message", handleFullscreenMessage);
 
             // 控制台彩蛋
             console.log("%c🚀 欢迎来到「角角向前冲」大闯关！", "font-size:20px;color:#6c5ce7;");
