@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>“角角向前冲”大闯关</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -37,6 +37,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            overflow-x: hidden;
         }
 
         /* 粒子画布容器 */
@@ -57,7 +58,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 0;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .logo {
@@ -76,12 +77,13 @@
 
         /* 主标题 */
         .hero {
-            margin: 30px 0 40px;
+            margin: 20px 0 30px;
             max-width: 800px;
             background: rgba(255,255,255,0.7);
             backdrop-filter: blur(2px);
             border-radius: 10px;
             padding: 20px;
+            width: 95%;
         }
 
         h1 {
@@ -119,16 +121,17 @@
 
         /* 游戏容器 */
         .game-container {
-            margin: 30px auto;
+            margin: 20px auto;
             box-shadow: 0 15px 40px rgba(0,0,0,0.12);
             border-radius: 16px;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
             background: rgba(255,255,255,0.92);
             backdrop-filter: blur(8px);
-            padding: 20px;
+            padding: 15px;
             border: 1px solid rgba(255,255,255,0.3);
-            width: fit-content;
+            width: 100%;
+            max-width: 485px;
         }
 
         .game-container:hover {
@@ -140,6 +143,9 @@
             border-radius: 10px;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
             border: 1px solid rgba(0,0,0,0.05);
+            width: 100%;
+            min-width: 300px;
+            height: 402px;
         }
 
         /* 游戏信息卡片 */
@@ -148,16 +154,16 @@
             justify-content: space-between;
             width: 100%;
             max-width: 800px;
-            margin: 30px 0;
+            margin: 25px 0;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
         }
 
         .info-card {
             background: rgba(255,255,255,0.92);
             backdrop-filter: blur(8px);
             border-radius: 12px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             flex: 1;
             min-width: 250px;
@@ -172,7 +178,7 @@
 
         .info-card h3 {
             color: var(--primary-dark);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-size: 1.3rem;
             display: flex;
             align-items: center;
@@ -187,13 +193,14 @@
         .info-card p {
             color: var(--gray-color);
             line-height: 1.6;
+            font-size: 0.95rem;
         }
 
         /* 操作按钮 */
         .action-buttons {
             display: flex;
             gap: 15px;
-            margin: 30px 0;
+            margin: 25px 0;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -242,8 +249,8 @@
         /* 页脚 */
         footer {
             width: 100%;
-            margin-top: 60px;
-            padding: 30px 0;
+            margin-top: 40px;
+            padding: 25px 0;
             color: var(--gray-color);
             font-size: 0.9rem;
             border-top: 1px solid rgba(0,0,0,0.08);
@@ -291,7 +298,7 @@
 
         .modal-content {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 15px;
             max-width: 800px;
             width: 90%;
@@ -320,35 +327,42 @@
             color: var(--primary-color);
         }
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem;
-            }
+        /* 选项卡样式 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
 
-            .game-info {
-                flex-direction: column;
-                align-items: center;
-            }
+        .tab-btn {
+            padding: 10px 20px;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
 
-            .info-card {
-                width: 100%;
-            }
+        .tab-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
 
-            .navbar {
-                flex-direction: column;
-                gap: 15px;
-            }
+        .tab-btn.active {
+            background: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4);
+        }
 
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
+        .game-tab {
+            display: none;
+            width: 100%;
+        }
 
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
+        .game-tab.active {
+            display: block;
         }
 
         /* 全屏模式样式 */
@@ -395,42 +409,112 @@
             height: 100%;
         }
 
-        /* 选项卡样式 */
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 10px;
+        /* ========== 响应式设计 ========== */
+        @media (max-width: 768px) {
+            html {
+                font-size: 15px;
+            }
+
+            body {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+
+            .highlight::after {
+                height: 6px;
+                bottom: 2px;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .game-container {
+                width: 95%;
+                padding: 10px;
+                margin: 15px auto;
+            }
+
+            iframe {
+                height: 60vh !important;
+                max-height: 400px;
+                min-height: 300px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                width: 90%;
+            }
+
+            .tab-btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .info-card {
+                padding: 15px;
+                min-width: auto;
+                width: 100%;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            #particles-js {
+                display: none;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .hero {
+                padding: 15px;
+                margin: 15px 0;
+            }
         }
 
-        .tab-btn {
-            padding: 10px 20px;
-            background: var(--primary-light);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+        @media (max-width: 480px) {
+            html {
+                font-size: 14px;
+            }
 
-        .tab-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
+            h1 {
+                font-size: 1.8rem;
+            }
 
-        .tab-btn.active {
-            background: var(--primary-color);
-            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4);
-        }
+            iframe {
+                height: 55vh !important;
+            }
 
-        .game-tab {
-            display: none;
-            width: 100%;
-        }
+            .logo {
+                font-size: 1.3rem;
+            }
 
-        .game-tab.active {
-            display: block;
+            .logo-icon {
+                font-size: 1.5rem;
+            }
+
+            footer p {
+                padding: 0 10px;
+                line-height: 1.5;
+                text-align: center;
+            }
+
+            .modal-content {
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
@@ -487,8 +571,7 @@
             <iframe id="shower1"
                 src="https://www.scratch-cw.top/projects/4764/embed"
                 allowtransparency="true"
-                width="485"
-                height="402"
+                style="width:100%; height:60vh; max-height:402px; min-height:300px;"
                 frameborder="0"
                 scrolling="no"
                 allowfullscreen>
@@ -498,8 +581,7 @@
             <iframe id="shower2"
                 src="https://www.scratch-cw.top/projects/4347/embed"
                 allowtransparency="true"
-                width="485"
-                height="402"
+                style="width:100%; height:60vh; max-height:402px; min-height:300px;"
                 frameborder="0"
                 scrolling="no"
                 allowfullscreen>
@@ -612,84 +694,86 @@
 
         // 初始化粒子效果
         document.addEventListener('DOMContentLoaded', function() {
-            particlesJS('particles-js', {
-                "particles": {
-                    "number": {
-                        "value": 60,
-                        "density": {
-                            "enable": true,
-                            "value_area": 800
-                        }
-                    },
-                    "color": {
-                        "value": "#a29bfe"
-                    },
-                    "shape": {
-                        "type": "circle",
-                        "stroke": {
-                            "width": 0,
-                            "color": "#000000"
-                        }
-                    },
-                    "opacity": {
-                        "value": 0.3,
-                        "random": false,
-                        "anim": {
-                            "enable": false
-                        }
-                    },
-                    "size": {
-                        "value": 3,
-                        "random": false,
-                        "anim": {
-                            "enable": false
-                        }
-                    },
-                    "line_linked": {
-                        "enable": false
-                    },
-                    "move": {
-                        "enable": true,
-                        "speed": 1,
-                        "direction": "none",
-                        "random": false,
-                        "straight": false,
-                        "out_mode": "out",
-                        "bounce": false,
-                        "attract": {
-                            "enable": false
-                        }
-                    }
-                },
-                "interactivity": {
-                    "detect_on": "canvas",
-                    "events": {
-                        "onhover": {
-                            "enable": true,
-                            "mode": "repulse"
+            if(window.innerWidth > 768) {
+                particlesJS('particles-js', {
+                    "particles": {
+                        "number": {
+                            "value": 60,
+                            "density": {
+                                "enable": true,
+                                "value_area": 800
+                            }
                         },
-                        "onclick": {
+                        "color": {
+                            "value": "#a29bfe"
+                        },
+                        "shape": {
+                            "type": "circle",
+                            "stroke": {
+                                "width": 0,
+                                "color": "#000000"
+                            }
+                        },
+                        "opacity": {
+                            "value": 0.3,
+                            "random": false,
+                            "anim": {
+                                "enable": false
+                            }
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": false,
+                            "anim": {
+                                "enable": false
+                            }
+                        },
+                        "line_linked": {
+                            "enable": false
+                        },
+                        "move": {
                             "enable": true,
-                            "mode": "bubble"
-                        },
-                        "resize": true
-                    },
-                    "modes": {
-                        "repulse": {
-                            "distance": 100,
-                            "duration": 0.4
-                        },
-                        "bubble": {
-                            "distance": 200,
-                            "size": 10,
-                            "duration": 2,
-                            "opacity": 0.8,
-                            "speed": 3
+                            "speed": 1,
+                            "direction": "none",
+                            "random": false,
+                            "straight": false,
+                            "out_mode": "out",
+                            "bounce": false,
+                            "attract": {
+                                "enable": false
+                            }
                         }
-                    }
-                },
-                "retina_detect": true
-            });
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": {
+                            "onhover": {
+                                "enable": true,
+                                "mode": "repulse"
+                            },
+                            "onclick": {
+                                "enable": true,
+                                "mode": "bubble"
+                            },
+                            "resize": true
+                        },
+                        "modes": {
+                            "repulse": {
+                                "distance": 100,
+                                "duration": 0.4
+                            },
+                            "bubble": {
+                                "distance": 200,
+                                "size": 10,
+                                "duration": 2,
+                                "opacity": 0.8,
+                                "speed": 3
+                            }
+                        }
+                    },
+                    "retina_detect": true
+                });
+            }
 
             // 滚动动画触发
             const animateElements = document.querySelectorAll('.animate');
@@ -714,63 +798,26 @@
             document.getElementById('guide-btn').addEventListener('click', function(e) {
                 e.preventDefault();
                 document.getElementById('guide-modal').style.display = 'flex';
-                // 粒子特效变化 - 增强显示
-                particlesJS('particles-js', {
-                    particles: {
-                        color: { value: "#a29bfe" },
-                        opacity: { value: 0.6 },
-                        size: { value: 4 },
-                        line_linked: {
-                            enable: true,
-                            opacity: 0.2,
-                            width: 1
-                        }
-                    }
-                });
+                document.body.style.overflow = 'hidden';
             });
 
             // 关闭按钮点击
-            function restoreParticles() {
-                particlesJS('particles-js', {
-                    particles: {
-                        color: { value: "#a29bfe" },
-                        opacity: { value: 0.3 },
-                        size: { value: 3 },
-                        line_linked: { enable: false }
-                    }
-                });
-            }
-
             document.querySelector('.close-modal').addEventListener('click', function() {
                 document.getElementById('guide-modal').style.display = 'none';
-                restoreParticles();
+                document.body.style.overflow = '';
             });
 
             // 点击模态框外部关闭
             window.addEventListener('click', function(e) {
                 if (e.target === document.getElementById('guide-modal')) {
                     document.getElementById('guide-modal').style.display = 'none';
-                    restoreParticles();
+                    document.body.style.overflow = '';
                 }
             });
 
             // 开始游戏按钮点击效果
             document.getElementById('play-btn').addEventListener('click', function(e) {
                 e.preventDefault();
-                // 粒子聚集效果
-                particlesJS('particles-js', {
-                    particles: {
-                        move: {
-                            speed: 3,
-                            attract: {
-                                enable: true,
-                                rotateX: 600,
-                                rotateY: 1200
-                            }
-                        }
-                    }
-                });
-
                 // 滚动到游戏位置
                 document.querySelector('#play').scrollIntoView({
                     behavior: 'smooth'
