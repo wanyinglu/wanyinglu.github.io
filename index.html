@@ -119,7 +119,7 @@
             line-height: 1.6;
         }
 
-        /* 游戏容器 */
+        /* 游戏容器 - 主要优化部分 */
         .game-container {
             margin: 20px auto;
             box-shadow: 0 15px 40px rgba(0,0,0,0.12);
@@ -130,8 +130,8 @@
             backdrop-filter: blur(8px);
             padding: 15px;
             border: 1px solid rgba(255,255,255,0.3);
-            width: 100%;
-            max-width: 485px;
+            width: 95%;
+            max-width: 900px; /* 增大最大宽度 */
         }
 
         .game-container:hover {
@@ -145,7 +145,8 @@
             border: 1px solid rgba(0,0,0,0.05);
             width: 100%;
             min-width: 300px;
-            height: 402px;
+            height: 65vh; /* 增加默认高度 */
+            max-height: 600px;
         }
 
         /* 游戏信息卡片 */
@@ -365,7 +366,7 @@
             display: block;
         }
 
-        /* 全屏模式样式 */
+        /* 全屏模式样式 - 主要优化部分 */
         .fullscreen-mode {
             position: fixed !important;
             top: 0 !important;
@@ -530,7 +531,7 @@
 
         @media (min-width: 769px) {
             .game-container {
-                max-width: 485px;
+                max-width: 900px; /* 增大电脑端最大宽度 */
             }
             #particles-js {
                 display: block !important;
@@ -538,8 +539,17 @@
 
             /* 电脑端全屏优化 */
             .fullscreen-mode iframe {
-                width: 800px !important;
-                height: 600px !important;
+                width: 90vw !important;
+                height: 90vh !important;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .game-container {
+                max-width: 950px; /* 大屏幕更宽 */
+            }
+            iframe {
+                height: 70vh; /* 大屏幕更高 */
             }
         }
     </style>
@@ -597,7 +607,7 @@
             <iframe id="shower1"
                 src="https://www.scratch-cw.top/projects/4764/embed"
                 allowtransparency="true"
-                style="width:100%; height:402px;"
+                style="width:100%; height:65vh; max-height:600px;"
                 frameborder="0"
                 scrolling="no"
                 allowfullscreen>
@@ -607,7 +617,7 @@
             <iframe id="shower2"
                 src="https://www.scratch-cw.top/projects/4347/embed"
                 allowtransparency="true"
-                style="width:100%; height:402px;"
+                style="width:100%; height:65vh; max-height:600px;"
                 frameborder="0"
                 scrolling="no"
                 allowfullscreen>
