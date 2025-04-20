@@ -384,6 +384,8 @@
             height: 100% !important;
             border: none !important;
             border-radius: 0 !important;
+            max-width: none !important;
+            max-height: none !important;
         }
 
         .fullscreen-close-btn {
@@ -402,6 +404,12 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .fullscreen-close-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.9);
         }
 
         .no-scroll {
@@ -516,6 +524,15 @@
                 padding: 20px 15px;
             }
         }
+
+        @media (min-width: 769px) {
+            .game-container {
+                max-width: 485px;
+            }
+            #particles-js {
+                display: block !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -571,7 +588,7 @@
             <iframe id="shower1"
                 src="https://www.scratch-cw.top/projects/4764/embed"
                 allowtransparency="true"
-                style="width:100%; height:60vh; max-height:402px; min-height:300px;"
+                style="width:100%; height:402px;"
                 frameborder="0"
                 scrolling="no"
                 allowfullscreen>
@@ -581,7 +598,7 @@
             <iframe id="shower2"
                 src="https://www.scratch-cw.top/projects/4347/embed"
                 allowtransparency="true"
-                style="width:100%; height:60vh; max-height:402px; min-height:300px;"
+                style="width:100%; height:402px;"
                 frameborder="0"
                 scrolling="no"
                 allowfullscreen>
@@ -617,47 +634,67 @@
     </footer>
 
     <script>
-        // 全屏功能处理
+        // 增强版全屏功能处理
         let isFullscreen = false;
-        let originalParent = null;
-        let originalStyles = null;
+        let originalIframeData = {
+            parent: null,
+            tab: null,
+            nextSibling: null,
+            styles: null
+        };
         let closeBtn = null;
-        let clonedIframe = null;
+        let fullscreenContainer = null;
 
         function handleFullscreenMessage(event) {
+            // 安全验证：检查消息来源是否是我们嵌入的iframe
+            const iframes = Array.from(document.querySelectorAll('iframe'));
+            const isValidSource = iframes.some(iframe => iframe.contentWindow === event.source);
+            
+            if (!isValidSource) return;
+
             if (event.data === "ScratchEmbedSetFullScreen") {
-                enterFullscreen();
+                enterFullscreen(event.source);
             } else if (event.data === "ScratchEmbedSetExitFullScreen") {
                 exitFullscreen();
             }
         }
 
-        function enterFullscreen() {
+        function enterFullscreen(sourceWindow) {
             if (isFullscreen) return;
+
+            // 找到触发全屏的iframe
+            const iframes = Array.from(document.querySelectorAll('iframe'));
+            const targetIframe = iframes.find(iframe => iframe.contentWindow === sourceWindow);
             
-            const activeIframe = document.querySelector('.game-tab.active iframe');
-            if (!activeIframe) return;
+            if (!targetIframe) return;
 
             // 保存原始状态
-            originalParent = activeIframe.parentNode;
-            originalStyles = {
-                width: activeIframe.style.width,
-                height: activeIframe.style.height,
-                position: activeIframe.style.position,
-                top: activeIframe.style.top,
-                left: activeIframe.style.left
+            originalIframeData = {
+                parent: targetIframe.parentNode,
+                tab: targetIframe.closest('.game-tab'),
+                nextSibling: targetIframe.nextSibling,
+                styles: {
+                    width: targetIframe.style.width,
+                    height: targetIframe.style.height,
+                    position: targetIframe.style.position,
+                    top: targetIframe.style.top,
+                    left: targetIframe.style.left,
+                    display: targetIframe.style.display
+                }
             };
 
             // 创建全屏容器
-            const container = document.createElement('div');
-            container.className = 'fullscreen-mode';
+            fullscreenContainer = document.createElement('div');
+            fullscreenContainer.className = 'fullscreen-mode';
             
-            // 克隆iframe避免重新加载
-            clonedIframe = activeIframe.cloneNode(true);
-            clonedIframe.id = 'fullscreen-iframe'; // 防止ID冲突
+            // 克隆iframe（保留所有属性和样式）
+            const clonedIframe = targetIframe.cloneNode(true);
+            clonedIframe.id = 'fullscreen-iframe-' + Date.now(); // 避免ID冲突
+            clonedIframe.style.width = '100%';
+            clonedIframe.style.height = '100%';
             
-            container.appendChild(clonedIframe);
-            document.body.appendChild(container);
+            fullscreenContainer.appendChild(clonedIframe);
+            document.body.appendChild(fullscreenContainer);
 
             // 添加关闭按钮
             closeBtn = document.createElement('div');
@@ -666,35 +703,46 @@
             closeBtn.onclick = exitFullscreen;
             document.body.appendChild(closeBtn);
 
-            // 隐藏原iframe
-            activeIframe.style.display = 'none';
+            // 隐藏原始iframe
+            targetIframe.style.display = 'none';
             
             isFullscreen = true;
             document.documentElement.classList.add('no-scroll');
+
+            // 添加ESC键监听
+            document.addEventListener('keydown', handleKeyDown);
         }
 
         function exitFullscreen() {
             if (!isFullscreen) return;
 
-            // 恢复原iframe
-            const originalIframe = document.querySelector('.game-tab.active iframe');
-            originalIframe.style.display = '';
-            
+            // 恢复原始iframe
+            const originalIframe = originalIframeData.parent.querySelector('iframe');
+            if (originalIframe) {
+                originalIframe.style.display = originalIframeData.styles.display || '';
+            }
+
             // 移除全屏元素
-            const container = document.querySelector('.fullscreen-mode');
-            if (container) container.remove();
+            if (fullscreenContainer) fullscreenContainer.remove();
             if (closeBtn) closeBtn.remove();
             
             isFullscreen = false;
             document.documentElement.classList.remove('no-scroll');
+
+            // 移除ESC键监听
+            document.removeEventListener('keydown', handleKeyDown);
         }
 
-        // 更新事件监听
-        window.addEventListener("message", handleFullscreenMessage);
+        function handleKeyDown(e) {
+            if (e.key === 'Escape' && isFullscreen) {
+                exitFullscreen();
+            }
+        }
 
         // 初始化粒子效果
         document.addEventListener('DOMContentLoaded', function() {
-            if(window.innerWidth > 768) {
+            // 仅电脑端加载粒子效果
+            if (window.innerWidth > 768) {
                 particlesJS('particles-js', {
                     "particles": {
                         "number": {
@@ -818,7 +866,6 @@
             // 开始游戏按钮点击效果
             document.getElementById('play-btn').addEventListener('click', function(e) {
                 e.preventDefault();
-                // 滚动到游戏位置
                 document.querySelector('#play').scrollIntoView({
                     behavior: 'smooth'
                 });
@@ -846,8 +893,19 @@
                 }
             });
 
+            // 监听窗口大小变化
+            window.addEventListener('resize', function() {
+                if (isFullscreen && window.innerWidth < 769) {
+                    exitFullscreen();
+                }
+            });
+
+            // 初始化全屏消息监听
+            window.addEventListener("message", handleFullscreenMessage, false);
+
             // 控制台彩蛋
             console.log("%c🚀 欢迎来到「角角向前冲」大闯关！", "font-size:20px;color:#6c5ce7;");
+            console.log("%c👉 全屏功能已优化，电脑端和手机端均可完美运行！", "font-size:14px;color:#636e72;");
         });
     </script>
 </body>
